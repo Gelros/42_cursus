@@ -6,7 +6,7 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 11:35:12 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/19 11:44:21 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/20 12:23:24 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,13 @@ size_t	ft_strlen(char *str)
 		i++;
 	return (i);
 }
+
 char	*ft_strdup(const char *s)
 {
 	char	*n_str;
 	size_t	i;
 
-	n_str = malloc(sizeof(char) * (ft_strlen((char *)s) + 1));
+	n_str = ft_calloc(sizeof(char), (ft_strlen((char *)s) + 1));
 	if (!n_str)
 		return (NULL);
 	i = 0;
@@ -46,7 +47,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 
 	if (start >= (unsigned int)ft_strlen((char *)s) || len == 0)
 		return (ft_strdup(""));
-	string = malloc(sizeof(char) * (len + 1));
+	string = ft_calloc(sizeof(char), (len + 1));
 	if (!string)
 		return (NULL);
 	i = 0;
@@ -80,13 +81,14 @@ char	*ft_strchr(const char *s, int c)
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	char *n_str;
-	int i;
-	int j;
+	char	*n_str;
+	int		i;
+	int		j;
 
 	if (!s1 || !s2)
 		return (NULL);
-	n_str = malloc(sizeof(char) * (ft_strlen((char *)s1) + ft_strlen((char *)s2) + 1));
+	n_str = ft_calloc(sizeof(char), (ft_strlen((char *)s1)
+				+ ft_strlen((char *)s2)) + 1);
 	if (!n_str)
 		return (NULL);
 	i = -1;

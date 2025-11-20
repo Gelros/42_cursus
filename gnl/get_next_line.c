@@ -6,15 +6,31 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 10:35:30 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/19 17:40:04 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/20 12:22:47 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_is_empty(char *tmp, char *buf, ssize_t size)
+void	*ft_calloc(size_t nmemb, size_t size)
 {
-	ssize_t	len;
+	char	*res;
+	size_t	i;
+
+	res = malloc(nmemb * size);
+	if (!res)
+		return (NULL);
+	i = 0;
+	while (i < nmemb * size)
+	{
+		res[i] = 0;
+		i++;
+	}
+	return ((void *)res);
+}
+
+char	*ft_is_empty(char *tmp, char *buf)
+{
 	char	*tmp2;
 
 	if (!tmp)
@@ -23,14 +39,19 @@ char	*ft_is_empty(char *tmp, char *buf, ssize_t size)
 	{
 		tmp2 = ft_strdup(tmp);
 		free(tmp);
-		len = ft_strlen(buf) + ft_strlen(tmp2);
-		tmp = malloc(sizeof(char) * len + 1);
-		if (!tmp)
-			return (NULL);
 		tmp = ft_strjoin(tmp2, buf);
 		free(tmp2);
 	}
 	return (tmp);
+}
+
+char	*ft_is_nothing(char **buffer, char **tmp)
+{
+	free(*buffer);
+	*buffer = NULL;
+	free(*tmp);
+	*tmp = NULL;
+	return (NULL);
 }
 
 char	*ft_end(char **buffer, char **tmp, ssize_t n_bytes)
@@ -38,15 +59,16 @@ char	*ft_end(char **buffer, char **tmp, ssize_t n_bytes)
 	char	*line;
 	char	*tmp2;
 
-	if (**tmp && *tmp && n_bytes == 0)
+	if (ft_strchr(*tmp, '\n') == NULL && *tmp && **tmp && n_bytes == 0)
 	{
 		line = ft_strdup(*tmp);
-		free(*tmp);
 		free(*buffer);
 		*buffer = NULL;
+		free(*tmp);
 		*tmp = NULL;
+		return (line);
 	}
-	else
+	if (ft_strchr(*tmp, '\n') != NULL)
 	{
 		line = ft_substr(*tmp, 0, (ft_strlen(*tmp) - ft_strlen(ft_strchr(*tmp,
 							'\n') + 1)));
@@ -54,8 +76,9 @@ char	*ft_end(char **buffer, char **tmp, ssize_t n_bytes)
 		free(*tmp);
 		*tmp = ft_strdup(tmp2);
 		free(tmp2);
+		return (line);
 	}
-	return (line);
+	return (ft_is_nothing(buffer, tmp));
 }
 
 char	*get_next_line(int fd)
@@ -72,33 +95,35 @@ char	*get_next_line(int fd)
 	{
 		if (ft_strchr(tmp, '\n') != NULL)
 			return (ft_end(&buffer, &tmp, n_bytes));
-		buffer = malloc(sizeof(char) * (BUFFER_SIZE));
+		buffer = ft_calloc(sizeof(char), (BUFFER_SIZE) + 1);
 		if (!buffer)
 			return (NULL);
 		n_bytes = read(fd, buffer, BUFFER_SIZE);
-		tmp = ft_is_empty(tmp, buffer, n_bytes);
+		if (n_bytes <= 0)
+			break ;
+		buffer[n_bytes] = '\0';
+		tmp = ft_is_empty(tmp, buffer);
 		free(buffer);
 		buffer = NULL;
 	}
 	return (ft_end(&buffer, &tmp, n_bytes));
 }
 
+/* #include <stdio.h>
+
 int	main(void)
 {
 	char *str = NULL;
-	char *buffer = NULL;
+	char *buf;
 
 	int fd = open("./file.txt", O_RDONLY);
-	str = get_next_line(fd);
-	printf("%s", str);
-	str = get_next_line(fd);
-	printf("%s", str);
 
-	/* while (str)
+	str = get_next_line(fd);
+	while (str)
 	{
-		printf("%s", str);
+		printf("%s",str);
+		free(str);
 		str = get_next_line(fd);
-	} */
-	free(str);
+	}
 	return (0);
-}
+} */
