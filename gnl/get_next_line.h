@@ -6,7 +6,7 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 11:09:43 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/20 12:23:16 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/20 14:51:58 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ char	*get_next_line(int fd);
 char	*ft_strdup(const char *s);
 size_t	ft_strlen(char *str);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*ft_strjoin(char const *s1, char const *s2);
+void	*ft_memcpy(void *dest, const void *src, size_t n);
 char	*ft_strchr(const char *s, int c);
 void	*ft_calloc(size_t nmemb, size_t size);
 

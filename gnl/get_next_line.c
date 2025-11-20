@@ -6,7 +6,7 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 10:35:30 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/20 12:22:47 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:26:26 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,23 @@ void	*ft_calloc(size_t nmemb, size_t size)
 
 char	*ft_is_empty(char *tmp, char *buf)
 {
-	char	*tmp2;
+	size_t	len_tmp;
+	size_t	len_buf;
+	char	*str;
 
-	if (!tmp)
-		tmp = ft_strdup(buf);
-	else
-	{
-		tmp2 = ft_strdup(tmp);
-		free(tmp);
-		tmp = ft_strjoin(tmp2, buf);
-		free(tmp2);
-	}
-	return (tmp);
+	len_tmp = 0;
+	len_buf = 0;
+	if (tmp)
+		len_tmp = ft_strlen(tmp);
+	len_buf = ft_strlen(buf);
+	str = ft_calloc(sizeof(char), (len_tmp + len_buf) + 1);
+	if (tmp)
+		ft_memcpy(str, tmp, len_tmp);
+	ft_memcpy(str + len_tmp, buf, len_buf);
+	str[len_buf + len_tmp] = '\0';
+	free(tmp);
+	tmp = NULL;
+	return (str);
 }
 
 char	*ft_is_nothing(char **buffer, char **tmp)
@@ -110,7 +115,6 @@ char	*get_next_line(int fd)
 }
 
 /* #include <stdio.h>
-
 int	main(void)
 {
 	char *str = NULL;

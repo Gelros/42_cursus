@@ -6,7 +6,7 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 11:35:12 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/20 12:23:24 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/20 14:52:04 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,28 +79,21 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
-	char	*n_str;
-	int		i;
-	int		j;
+	unsigned char	*temp_dest;
+	const char		*temp_src;
+	size_t			i;
 
-	if (!s1 || !s2)
-		return (NULL);
-	n_str = ft_calloc(sizeof(char), (ft_strlen((char *)s1)
-				+ ft_strlen((char *)s2)) + 1);
-	if (!n_str)
-		return (NULL);
-	i = -1;
-	while (++i < (int)ft_strlen((char *)s1))
-		n_str[i] = s1[i];
-	j = 0;
-	while (i < ((int)ft_strlen((char *)s1) + (int)ft_strlen((char *)s2)))
+	if (dest == NULL && src == NULL)
+		return (dest);
+	temp_dest = dest;
+	temp_src = src;
+	i = 0;
+	while (i < n)
 	{
-		n_str[i] = s2[j];
+		temp_dest[i] = temp_src[i];
 		i++;
-		j++;
 	}
-	n_str[i] = '\0';
-	return (n_str);
+	return (dest);
 }
