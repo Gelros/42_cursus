@@ -6,11 +6,11 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 11:02:32 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/13 11:13:20 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:44:30 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "printf.h"
+#include "ft_printf.h"
 
 int	ft_putchar(char c)
 {

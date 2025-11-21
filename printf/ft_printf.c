@@ -6,12 +6,11 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 15:41:40 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/14 09:48:25 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/14 17:01:45 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "printf.h"
-#include <stdio.h>
+#include "ft_printf.h"
 
 static int	ft_format(va_list ap, char c)
 {
@@ -63,6 +62,14 @@ int	ft_printf(const char *str, ...)
 	va_end(ap);
 	return (count);
 }
+/* #include <stdio.h>
+int	main(void)
+{
+	int i = ft_printf(" NULL %s NULL \n", NULL);
+	printf("size  = %d\n", i);
+	int b = printf(" NULL %s NULL \n", NULL);
+	printf("size  = %d\n", b);
+} */
 /* #include <stdio.h>
 
 int	main(void)

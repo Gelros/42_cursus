@@ -6,11 +6,11 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 11:50:39 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/14 08:51:15 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/14 17:01:36 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "printf.h"
+#include "ft_printf.h"
 
 int	ft_putstr(char *s)
 {
@@ -18,7 +18,10 @@ int	ft_putstr(char *s)
 
 	i = 0;
 	if (!s)
-		return (write(1, "(null)", 6));
+	{
+		i += write(1, "(null)", 6);
+		return (i);
+	}
 	while (s[i])
 		i += ft_putchar(s[i]);
 	return (i);

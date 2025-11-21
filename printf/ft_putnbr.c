@@ -6,11 +6,11 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 11:13:55 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/13 15:03:18 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:44:45 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "printf.h"
+#include "ft_printf.h"
 
 int	ft_putnbr(long nb)
 {

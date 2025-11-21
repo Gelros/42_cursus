@@ -6,33 +6,20 @@
 /*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 15:54:32 by guilacol          #+#    #+#             */
-/*   Updated: 2025/11/14 09:43:57 by guilacol         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:57:45 by guilacol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "printf.h"
-#include <stdio.h>
+#include "ft_printf.h"
 
 static int	ft_base(unsigned long nb)
 {
 	char	*base;
-	int		i;
-	char	ca;
-	char	n;
 	int		count;
 
-	i = -1;
-	n = '0';
-	ca = 'a';
 	count = 0;
-	base = malloc(sizeof(char) * 16);
-	if (!base)
-		return (0);
-	while (++i < 10)
-		base[i] = n++;
-	while (i < 16)
-		base[i++] = ca++;
-	if (nb > 16)
+	base = "0123456789abcdef";
+	if (nb > 15)
 		count += ft_base(nb / 16);
 	count += ft_putchar(base[nb % 16]);
 	return (count);
@@ -40,8 +27,8 @@ static int	ft_base(unsigned long nb)
 
 int	ft_putptr(void *ptr)
 {
-	long	n;
-	int		count;
+	unsigned long	n;
+	int				count;
 
 	if (!ptr)
 		return (write(1, "(nil)", 5));
