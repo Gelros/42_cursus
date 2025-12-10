@@ -3,11 +3,10 @@
 
 /* ==== Includes ==== */
 
-# include <unistd.h>
-# include <stdlib.h>
-# include <limits.h>
-
 # include "../libft/libft.h"
+# include <limits.h>
+# include <stdlib.h>
+# include <unistd.h>
 
 /* ==== Parsing ==== */
 
@@ -53,5 +52,6 @@ void	assign_index(t_list *a); // utile pour radix
 
 void	print_error(void);
 void	free_all(t_list **a, t_list **b, char **args);
+void	free_split(char **args);
 
 #endif
