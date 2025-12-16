@@ -1,47 +1,56 @@
-# =========================
-# Variables
-# =========================
-NAME = push_swap
 
-CC = cc
-CFLAGS = -Wall -Wextra -Werror
-INCLUDE_DIR = includes
-SRC_DIR = src
-LIBFT_DIR = libft
+NAME        = push_swap
 
-# Récupération de tous les fichiers .c du dossier src et ses sous-dossiers
-SRC = $(shell find $(SRC_DIR) -name "*.c")
-OBJ = $(SRC:.c=.o)
+CC          = cc
+CFLAGS      = -Wall -Wextra -Werror
 
-# Libft
-LIBFT = $(LIBFT_DIR)/libft.a
+INC_DIR     = includes
+LIBFT_DIR   = libft
+LIBFT       = $(LIBFT_DIR)/libft.a
+
+SRCS        = \
+	src/main.c \
+	src/parse/parsing.c \
+	src/parse/check_errors.c \
+	src/parse/fill_stack.c \
+	src/stack/stack_utils.c \
+	src/stack/stack_utils2.c \
+	src/operations/push.c \
+	src/operations/swap.c \
+	src/operations/rotate.c \
+	src/operations/reverse_rotate.c \
+	src/algo/sort_small.c \
+	src/algo/sort_big.c \
+	src/algo/utils_algo.c \
+	src/utils/errors.c \
+	src/utils/free.c \
+	src/utils/utils.c
+
+OBJS        = $(SRCS:.c=.o)
 
 # =========================
-# Règle par défaut
+# Rules
 # =========================
+
 all: $(NAME)
 
-# =========================
-# Compilation de libft si nécessaire
-# =========================
+$(NAME): $(OBJS) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -o $(NAME)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR) -c $< -o $@
+
 $(LIBFT):
-	@make -C $(LIBFT_DIR)
+	$(MAKE) -C $(LIBFT_DIR) bonus
 
-# =========================
-# Compilation de push_swap
-# =========================
-$(NAME): $(OBJ) $(LIBFT)
-	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -I$(INCLUDE_DIR) -o $(NAME)
-
-# =========================
-# Nettoyage
-# =========================
 clean:
-	@rm -f $(OBJ)
-	@make clean -C $(LIBFT_DIR)
+	rm -f $(OBJS)
+	$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
-	@rm -f $(NAME)
-	@make fclean -C $(LIBFT_DIR)
+	rm -f $(NAME)
+	$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean all
+
+.PHONY: all clean fclean re

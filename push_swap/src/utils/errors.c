@@ -1,1 +1,6 @@
-#include "push_swap.h"
+#include "../../includes/push_swap.h"
+
+void	print_error(void)
+{
+    write(2, "Error\n", 6);
+}
