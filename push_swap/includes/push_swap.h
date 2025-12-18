@@ -23,8 +23,9 @@ void	fill_stack(t_list **a, char **args);
 int		get_value(t_list *node);
 int		stack_min(t_list *a);
 int		stack_max(t_list *a);
-int		stack_index_of(t_list *a, int value);
+int		stack_pos(t_list *a, int value);
 void	free_stack(t_list **stack);
+int		is_sorted(t_list *a);
 
 /* ==== Operations ==== */
 
