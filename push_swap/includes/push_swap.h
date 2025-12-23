@@ -53,7 +53,7 @@ void	assign_index(t_list *a); // utile pour radix
 /* ==== Utils ==== */
 
 void	print_error(void);
-void	free_all(t_list **a, t_list **b, char **args);
+void	free_all(t_list **a, t_list **b);
 void	free_split(char **args);
 
 #endif

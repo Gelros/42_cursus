@@ -2,11 +2,10 @@
 
 void	free_split(char **args)
 {
-	int i;
+	int	i;
 
 	if (!args)
 		return ;
-
 	i = 0;
 	while (args[i])
 	{
@@ -14,4 +13,12 @@ void	free_split(char **args)
 		i++;
 	}
 	free(args);
+}
+
+void	free_all(t_list **a, t_list **b)
+{
+	if (*a)
+		free_stack(a);
+	if (*b)
+		free_stack(b);
 }
