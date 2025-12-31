@@ -1,5 +1,6 @@
 #include "../../includes/push_swap.h"
 
+/*Verifie que tous les nombres soient valides*/
 int	is_valid_number(const char *str)
 {
 	long	res;

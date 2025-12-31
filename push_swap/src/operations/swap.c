@@ -2,25 +2,21 @@
 
 void	sa(t_list **a, int print)
 {
-	t_list	*tmp;
+	int	tmp;
 
-	tmp = (*a)->next->content;
-	if (!tmp || tmp->next == NULL)
-		return ;
-	(*a)->next->content = (*a)->content;
-	(*a)->content = tmp;
+	tmp = *(int *)(*a)->content;
+	*(int *)(*a)->content = *(int *)(*a)->next->content;
+	*(int *)(*a)->next->content = tmp;
 	if (print)
 		write(1, "sa\n", 3);
 }
 void	sb(t_list **b, int print)
 {
-	t_list	*tmp;
+	int	tmp;
 
-	tmp = (*b)->next->content;
-	if (!tmp || tmp->next == NULL)
-		return ;
-	(*b)->next->content = (*b)->content;
-	(*b)->content = tmp;
+	tmp = *(int *)(*b)->content;
+	*(int *)(*b)->content = *(int *)(*b)->next->content;
+	*(int *)(*b)->next->content = tmp;
 	if (print)
 		write(1, "sb\n", 3);
 }

@@ -21,6 +21,8 @@ int	parse_args(int argc, char **argv, t_list **a)
 		return (0);
 	if (!check_errors(args) && argc == 2)
 		return (free_split(args), 0);
+	if (!check_errors(args) && argc > 2)
+		return (free_stack(a), 0);
 	fill_stack(a, args);
 	if (!has_duplicates(*a))
 		return (0);
@@ -28,4 +30,3 @@ int	parse_args(int argc, char **argv, t_list **a)
 		free_split(args);
 	return (1);
 }
-

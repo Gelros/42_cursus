@@ -39,9 +39,7 @@ void	fill_stack(t_list **a, char **args)
 		*value = ft_atoi(args[i]);
 		lst = ft_lstnew(value);
 		if (!lst)
-		{
 			return ;
-		}
 		ft_lstadd_back(a, lst);
 		i++;
 	}

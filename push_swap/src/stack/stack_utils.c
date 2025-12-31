@@ -1,12 +1,14 @@
 #include "../../includes/push_swap.h"
 
+/* Avoir la valeur contenu dans le content d'un noeud */
 int	get_value(t_list *node)
+
 {
 	if (!node || !node->content)
 		return (0);
 	return (*(int *)node->content);
 }
-
+/* Avoir le content le plus petit */
 int	stack_min(t_list *a)
 {
 	int		min;
@@ -24,7 +26,7 @@ int	stack_min(t_list *a)
 	}
 	return (min);
 }
-
+/* Avoir le content le plus élevée */
 int	stack_max(t_list *a)
 {
 	int		max;
@@ -43,6 +45,7 @@ int	stack_max(t_list *a)
 	return (max);
 }
 
+/* Avoir la position du noeud qui contient la valeur voulu */
 int	stack_pos(t_list *a, int value)
 {
 	t_list	*tmp;

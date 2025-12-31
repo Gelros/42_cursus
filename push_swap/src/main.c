@@ -34,11 +34,8 @@ int	main(int argc, char **argv)
 		tmp2 = tmp2->next;
 		i++;
 	}
-	printf("\n");
-    printf("\n");
-    printf("\n");
-	printf("\n");
-	ra(&a,1);
+	
+    sort_small(&a, &b);
 	tmp2 = b;
 	tmp = a;
 	i = 0;
@@ -49,8 +46,7 @@ int	main(int argc, char **argv)
 		i++;
 	}
 	i = 0;
-    printf("\n");
-    printf("\n");
+    
 	while (tmp2)
 	{
 		printf("Apres b[%d] = %d\n", i, *(int *)tmp2->content);

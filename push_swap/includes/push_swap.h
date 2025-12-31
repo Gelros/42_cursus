@@ -48,7 +48,7 @@ void	rrr(t_list **a, t_list **b, int print);
 
 void	sort_small(t_list **a, t_list **b);
 void	sort_big(t_list **a, t_list **b);
-void	assign_index(t_list *a); // utile pour radix
+void	assign_index(t_list *a);
 
 /* ==== Utils ==== */
 
