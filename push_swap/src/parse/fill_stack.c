@@ -14,7 +14,6 @@ int	has_duplicates(t_list *a)
 			if (*(int *)tmp1->content == *(int *)tmp2->content)
 			{
 				ft_lstclear(&a, free);
-				printf("Doublon detecté");
 				return (0);
 			}
 			tmp2 = tmp2->next;

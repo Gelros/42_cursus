@@ -15,41 +15,26 @@ int	main(int argc, char **argv)
 		print_error();
 		return (1);
 	}
-	/* Affichage temporaire pour vérifier le contenu de la stack */
-	tmp = a;
-	tmp2 = b;
-	i = 0;
-	if (is_sorted(tmp))
+	assign_index(a);
+	if (is_sorted(a))
 		return (free_stack(&a), 0);
-	while (tmp)
-	{
-		printf("Avant a[%d] = %d\n", i, *(int *)tmp->content);
-		tmp = tmp->next;
-		i++;
-	}
-	i = 0;
-	while (tmp2)
-	{
-		printf("Avant b[%d] = %d\n", i, *(int *)tmp2->content);
-		tmp2 = tmp2->next;
-		i++;
-	}
-	
-    sort_small(&a, &b);
+	if (ft_lstsize(a) > 5)
+		sort_big(&a, &b);
+	else
+		sort_small(&a, &b);
 	tmp2 = b;
 	tmp = a;
 	i = 0;
 	while (tmp)
 	{
-		printf("apres a[%d] = %d\n", i, *(int *)tmp->content);
+		printf("a[%d] = %d\n", i, *(int *)tmp->content);
 		tmp = tmp->next;
 		i++;
 	}
 	i = 0;
-    
 	while (tmp2)
 	{
-		printf("Apres b[%d] = %d\n", i, *(int *)tmp2->content);
+		printf("b[%d] = %d\n", i, *(int *)tmp2->content);
 		tmp2 = tmp2->next;
 		i++;
 	}
