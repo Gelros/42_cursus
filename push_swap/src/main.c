@@ -4,9 +4,9 @@ int	main(int argc, char **argv)
 {
 	t_list	*a;
 	t_list	*b;
-	t_list	*tmp;
+	/* t_list	*tmp;
 	t_list	*tmp2;
-	int		i;
+	int		i; */
 
 	a = NULL;
 	b = NULL;
@@ -22,7 +22,7 @@ int	main(int argc, char **argv)
 		sort_big(&a, &b);
 	else
 		sort_small(&a, &b);
-	tmp2 = b;
+	/* tmp2 = b;
 	tmp = a;
 	i = 0;
 	while (tmp)
@@ -37,7 +37,7 @@ int	main(int argc, char **argv)
 		printf("b[%d] = %d\n", i, *(int *)tmp2->content);
 		tmp2 = tmp2->next;
 		i++;
-	}
+	} */
 	/* Nettoyage */
 	free_all(&a, &b);
 	return (0);

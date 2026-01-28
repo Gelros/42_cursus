@@ -114,7 +114,7 @@ char	*get_next_line(int fd)
 	return (ft_end(&buffer, &tmp, n_bytes));
 }
 
-/* #include <stdio.h>
+#include <stdio.h>
 int	main(void)
 {
 	char *str = NULL;
@@ -130,4 +130,4 @@ int	main(void)
 		str = get_next_line(fd);
 	}
 	return (0);
-} */
+}
