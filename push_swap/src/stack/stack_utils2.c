@@ -16,10 +16,15 @@ void	free_stack(t_list **stack)
 {
 	t_list	*tmp;
 
+	if (!stack || !*stack)
+        return ;
 	while (*stack)
 	{
 		tmp = (*stack)->next;
+		if ((*stack)->content)
+            free((*stack)->content);
 		free(*stack);
 		*stack = tmp;
 	}
+	*stack = NULL;
 }

@@ -55,7 +55,6 @@ void	fill_stack(t_list **a, char **args)
 			return ;
 		}
 		ft_lstadd_back(a, lst);
-		free(value);
 		i++;
 	}
 	
