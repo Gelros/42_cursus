@@ -12,6 +12,20 @@
 
 #include "../../includes/push_swap.h"
 
+int	is_split(char **argv)
+{
+	int	i;
+
+	i = 0;
+	while (argv[1][i])
+	{
+		if (argv[1][i] == ' ')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 char	**split_arguments(int argc, char **argv)
 {
 	if (argc == 2)
@@ -37,7 +51,12 @@ int	parse_args(int argc, char **argv, t_list **a)
 		return (free_stack(a), 0);
 	fill_stack(a, args);
 	if (!has_duplicates(*a))
+	{
+		free_stack(a);
+		if (argc == 2)
+			free_split(args);
 		return (0);
+	}
 	if (need_free)
 		free_split(args);
 	return (1);

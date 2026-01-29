@@ -24,10 +24,7 @@ int	has_duplicates(t_list *a)
 		while (tmp2)
 		{
 			if (*(int *)tmp1->content == *(int *)tmp2->content)
-			{
-				free_stack(&a);
 				return (0);
-			}
 			tmp2 = tmp2->next;
 		}
 		tmp1 = tmp1->next;
