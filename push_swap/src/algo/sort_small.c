@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sort_small.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/29 13:42:49 by guilacol          #+#    #+#             */
+/*   Updated: 2026/01/29 13:55:35 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/push_swap.h"
 
 static int	min_pos(t_list *a)
@@ -17,23 +29,24 @@ void	sort_3(t_list **a)
 	first = *(int *)(*a)->content;
 	sec = *(int *)(*a)->next->content;
 	third = *(int *)(*a)->next->next->content;
-	if (first > sec && sec < third && third > first) /* Cas avec 2 1 3 */
+	if (first > sec && sec < third && third > first)
 		sa(a, 1);
-	else if (first > sec && sec > third) /* Cas avec 3 2 1 */
+	else if (first > sec && sec > third)
 	{
 		ra(a, 1);
 		sa(a, 1);
 	}
-	else if (first > sec && sec < third && third < first) /* Cas avec 3 1 2 */
+	else if (first > sec && sec < third && third < first)
 		ra(a, 1);
-	else if (first < sec && sec > third && third > first) /* Cas avec 1 3 2 */
+	else if (first < sec && sec > third && third > first)
 	{
 		sa(a, 1);
 		ra(a, 1);
 	}
-	else if (first < sec && sec > third && third < first) /* Cas avec 2 3 1 */
+	else if (first < sec && sec > third && third < first)
 		rra(a, 1);
 }
+
 void	sort_5(t_list **a, t_list **b)
 {
 	int	min_val_pos;
@@ -64,6 +77,6 @@ void	sort_small(t_list **a, t_list **b)
 		sa(a, 1);
 	if (size == 3)
 		sort_3(a);
-	if (size == 4 || size ==  5)
+	if (size == 4 || size == 5)
 		sort_5(a, b);
 }

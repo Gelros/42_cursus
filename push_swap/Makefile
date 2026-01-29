@@ -2,7 +2,7 @@
 NAME        = push_swap
 
 CC          = cc
-CFLAGS      = -Wall -Wextra -Werror
+CFLAGS      = -Wall -Wextra -Werror -g
 
 INC_DIR     = includes
 LIBFT_DIR   = libft
@@ -21,10 +21,8 @@ SRCS        = \
 	src/operations/reverse_rotate.c \
 	src/algo/sort_small.c \
 	src/algo/sort_big.c \
-	src/algo/utils_algo.c \
 	src/utils/errors.c \
-	src/utils/free.c \
-	src/utils/utils.c
+	src/utils/free.c
 
 OBJS        = $(SRCS:.c=.o)
 

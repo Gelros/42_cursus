@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fill_stack.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/29 13:43:51 by guilacol          #+#    #+#             */
+/*   Updated: 2026/01/29 17:28:52 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/push_swap.h"
 
 int	has_duplicates(t_list *a)
@@ -13,7 +25,7 @@ int	has_duplicates(t_list *a)
 		{
 			if (*(int *)tmp1->content == *(int *)tmp2->content)
 			{
-				ft_lstclear(&a, free);
+				free_stack(&a);
 				return (0);
 			}
 			tmp2 = tmp2->next;
@@ -35,11 +47,16 @@ void	fill_stack(t_list **a, char **args)
 		value = malloc(sizeof(int));
 		if (!value)
 			return ;
-		*value = ft_atoi(args[i]);
+		value[0] = ft_atoi(args[i]);
 		lst = ft_lstnew(value);
 		if (!lst)
+		{
+			free(value);
 			return ;
+		}
 		ft_lstadd_back(a, lst);
+		free(value);
 		i++;
 	}
+	
 }

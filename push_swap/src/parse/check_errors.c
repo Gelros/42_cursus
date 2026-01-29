@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   check_errors.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/29 13:43:45 by guilacol          #+#    #+#             */
+/*   Updated: 2026/01/29 13:54:39 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/push_swap.h"
 
-/*Verifie que tous les nombres soient valides*/
 int	is_valid_number(const char *str)
 {
 	long	res;
@@ -22,7 +33,7 @@ int	is_valid_number(const char *str)
 		if (str[i] < '0' || str[i] > '9')
 			return (0);
 		res = res * 10 + (str[i++] - '0');
-		if ((sign == 1 && res > INT_MAX) || (sign == -1 && -res < INT_MIN))
+		if ((sign == 1 && res > INT_MAX) || (sign == -1 && - res < INT_MIN))
 			return (0);
 	}
 	return (1);

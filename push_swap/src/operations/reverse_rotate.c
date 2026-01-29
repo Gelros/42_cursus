@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   reverse_rotate.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/29 13:43:24 by guilacol          #+#    #+#             */
+/*   Updated: 2026/01/29 13:49:47 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/push_swap.h"
 
 void	rra(t_list **a, int print)
@@ -22,7 +34,7 @@ void	rra(t_list **a, int print)
 
 void	rrb(t_list **b, int print)
 {
-    t_list	*last;
+	t_list	*last;
 	t_list	*post_last;
 
 	if (!*b || !(*b)->next)
@@ -42,7 +54,7 @@ void	rrb(t_list **b, int print)
 
 void	rrr(t_list **a, t_list **b, int print)
 {
-    rra(a, 0);
+	rra(a, 0);
 	rrb(b, 0);
 	if (print)
 		write(1, "rrr\n", 3);
