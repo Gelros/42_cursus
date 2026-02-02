@@ -29,6 +29,7 @@ int		check_errors(char **args);
 int		is_valid_number(const char *str);
 int		has_duplicates(t_list *a);
 void	fill_stack(t_list **a, char **args);
+int		is_split(char **str);
 
 /* ==== Stack utils ==== */
 

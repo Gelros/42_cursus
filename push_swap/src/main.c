@@ -19,9 +19,9 @@ int	main(int argc, char **argv)
 
 	a = NULL;
 	b = NULL;
-	if (argc <= 2)
+	if (argc <= 2 && !is_split(argv))
 		return (0);
-	if (argc < 2 || !parse_args(argc, argv, &a))
+	if (!parse_args(argc, argv, &a))
 	{
 		print_error();
 		return (1);
@@ -33,6 +33,5 @@ int	main(int argc, char **argv)
 		sort_big(&a, &b);
 	else
 		sort_small(&a, &b);
-	free_all(&a, &b);
-	return (0);
+	return (free_all(&a, &b), 0);
 }
