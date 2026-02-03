@@ -4,6 +4,8 @@ def ft_garden_intro(name: str, height: int, age: int) -> None:
     print(f"Height: {height}cm")
     print(f"Age: {age} days\n")
     print("=== End of Program ===")
+
+
 if __name__ == "__main__":
     plant_name = "Rose"
     height = 25

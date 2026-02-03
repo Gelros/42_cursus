@@ -67,7 +67,7 @@ class GardenManager:
 
     def growing(self, value):
         if value < 0:
-            print(f"\nLa valeur de croissance doit etre positive !")
+            print("\nLa valeur de croissance doit etre positive !")
 
         else:
             print(f"\n{self.name} is helping all plants grow...")
@@ -78,17 +78,17 @@ class GardenManager:
     def individual_report(self):
         print(f"\n=== {self.name}'s Garden Report ===")
         print("Plants in garden:")
+        garden = GardenManager
+        s_p = self.plants
         for p in self.plants:
             print(p)
-        print(
-            f"\nPlants added: {GardenManager.GardenStat.ft_len(self.plants)}, ", end=""
-        )
-        print(
-            f"Total growth: {GardenManager.GardenStat.ft_sum(p.growth for p in self.plants)}cm"
-        )
-        print(
-            f"Plant types:  {GardenManager.type_verif(self.plants, Plant)} regular, {GardenManager.type_verif(self.plants, FloweringPlant)} flowering, {GardenManager.type_verif(self.plants, PrizeFlower)} prize flowers"
-        )
+        print(f"\nPlants added: {garden.GardenStat.ft_len(s_p)}, ", end="")
+        print("Total growth: ", end="")
+        print(f"{garden.GardenStat.ft_sum(p.growth for p in s_p)}cm")
+
+        print(f"Plant types: {garden.type_verif(s_p, Plant)} regular,", end="")
+        print(f" {garden.type_verif(s_p, FloweringPlant)} flowering, ", end="")
+        print(f"{garden.type_verif(s_p, PrizeFlower)} prize flowers")
 
     @staticmethod
     def type_verif(plants_list, target):
@@ -112,16 +112,15 @@ class GardenManager:
         m = cls.all_managers[0]
         m.growing(value)
         m.individual_report()
-        print(
-            f"\nGarden score - {m.name}: {GardenManager.GardenStat.total_score(m.plants)}",
-            end="",
-        )
         GardenManager.is_neg(cls.all_managers)
+        print(f"Garden score - {m.name}: ", end="")
+        print(f"{GardenManager.GardenStat.total_score(m.plants)}", end="")
         for garden in cls.all_managers[1:]:
-            print(
-                f", {garden.name}: {cls.GardenStat.total_score(garden.plants)}", end=""
-            )
-        print(f"Total gardens managed: {cls.GardenStat.ft_len(cls.all_managers)}")
+            print(f", {garden.name}: ", end="")
+            print(f"{cls.GardenStat.total_score(garden.plants)}", end="")
+        print("\nTotal gardens managed: ", end="")
+        print(f"{cls.GardenStat.ft_len(cls.all_managers)}")
+
 
 if __name__ == "__main__":
     alice = GardenManager("Alice")
@@ -130,5 +129,6 @@ if __name__ == "__main__":
     print("=== Garden Management System Demo ===\n")
     alice.add_plant(FloweringPlant("Rose", 32, "red"))
     alice.add_plant(PrizeFlower("Orchidée", 34, "white", 10))
-    bob.add_plant(Plant("Pacrette", 3))
+    alice.add_plant(Plant("Pacrette", 3))
+    bob.add_plant(Plant("Rose", 12))
     GardenManager.create_garden_network(2)

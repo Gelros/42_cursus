@@ -3,10 +3,14 @@ class Plant:
         self.name = name
         self.height = height
         self.age = age
+
     def ft_print(self):
-        print(f"Created: {self.name.capitalize()} ({self.height}cm, {self.age} days)")
+        print(f"Created: {self.name.capitalize()} ", end="")
+        print(f"({self.height}cm, {self.age} days)")
+
+
 if __name__ == "__main__":
-    generate_name = ["Rose", "Eucalyptus", "Cactus", "Paquerette", "Menthe", "Arbre"]
+    generate_name = ["Rose", "Eucalyptus", "Cactus", "Paquerette"]
     garden = []
     n = 0
     for i in generate_name:
@@ -20,4 +24,3 @@ if __name__ == "__main__":
     for i in garden:
         i.ft_print()
     print(f"\nTotal plants created: {n}")
-    

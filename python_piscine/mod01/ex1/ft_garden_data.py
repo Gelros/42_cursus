@@ -3,8 +3,11 @@ class Plant:
         self.name = name
         self.height = height
         self.age = age
+
     def ft_print(self):
         print(f"{self.name}: {self.height}cm, {self.age} days old")
+
+
 if __name__ == "__main__":
     lst = [
         Plant("Rose", 21, 34),

@@ -3,14 +3,18 @@ class Plant:
         self.name = name
         self.height = height
         self.age = age
+
     def ft_print(self):
-        print(f"{self.name}: {self.height}cm {self.age} days old")
+        print(f"{self.name}: {self.height}cm, {self.age} days old")
+
     def modif(self):
         self.height += 1
         self.age += 1
+
+
 if __name__ == "__main__":
     lst = [
-        Plant("Rose", 25, 2)
+        Plant("Rose", 25, 30)
     ]
     days = 7
     count = lst[0].height
@@ -21,4 +25,3 @@ if __name__ == "__main__":
             p.modif()
     count = lst[0].height - (count + 1)
     print(f"Growth this week: +{count}cm")
-    
