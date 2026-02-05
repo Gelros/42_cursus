@@ -11,13 +11,14 @@ class ProcessingStage(Protocol):
 class ProcessingPipeline(ABC):
     def __init__(self, pipeline_id: str):
         self.stages: List[ProcessingStage] = []
+        self.pipeline_id = pipeline_id
 
     @abstractmethod
     def process(self, data: Any) -> Any:
         ...
 
-    def add_stage():
-        ...
+    def add_stage(self, stage: Any) -> None:
+        self.stages.append(stage)
 
 
 class InputStage:
