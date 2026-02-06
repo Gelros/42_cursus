@@ -1,6 +1,5 @@
 from typing import Protocol, Any, List
 from abc import ABC, abstractmethod
-import time
 
 
 class ProcessingStage(Protocol):
@@ -20,23 +19,44 @@ class ProcessingPipeline(ABC):
     def add_stage(self, stage: Any) -> None:
         self.stages.append(stage)
 
+    def run(self, data: Any) -> None:
+        res = data
+        for p in self.stages:
+            res = p.process(res)
+        return res
+
 
 class InputStage:
     def process(self, data: Any) -> dict:
-        print("Input validation and parsing")
-        return f"Input: {data}"
+        if not data:
+            raise ValueError("Input data error")
+        if isinstance(data, str):
+            res = {}
+            words = data.split()
+            for i in range(0, len(words), 2):
+                if i + 1 < len(words):
+                    key = words[i]
+                    val = words[i + 1]
+                    res[key] = val
+            return res
+        elif isinstance(data, list):
+            res = {data[i]: data[i + 1] for i in range(0, len(data), 2)}
+            return res
+        return data
 
 
 class TransformStage:
     def process(self, data: Any) -> dict:
-        print("Data transformation and enrichment")
-        return f"Data: {data}"
+        if not data:
+            raise ValueError("Transform data error")
+        return data
 
 
 class OutputStage:
     def process(self, data: Any) -> str:
-        print("Output formatting and delivery")
-        return f"Output: {data}"
+        if not data:
+            raise ValueError("Output data error")
+        return f"Processed {data}"
 
 
 class JsonAdapter(ProcessingPipeline):
@@ -57,10 +77,11 @@ class StreamAdapter(ProcessingPipeline):
     ...
 
 
-class NexusManager(ProcessingPipeline):
+class NexusManager:
     def add_pipeline():
         ...
     ...
+
 
 if __name__ == "__main__":
     ...
