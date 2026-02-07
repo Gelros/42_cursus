@@ -1,4 +1,4 @@
-from typing import Protocol, Any, List, Union, Dict
+from typing import Protocol, Any, List, Union, Dict, Optional
 from abc import ABC, abstractmethod
 
 
@@ -8,9 +8,9 @@ class ProcessingStage(Protocol):
 
 
 class ProcessingPipeline(ABC):
-    def __init__(self, pipeline_id: str):
+    def __init__(self, pipeline_id: str) -> None:
         self.stages: List[ProcessingStage] = []
-        self.pipeline_id = pipeline_id
+        self.pipeline_id: str = pipeline_id
         self.record_processed: int = 0
 
     @abstractmethod
@@ -20,8 +20,8 @@ class ProcessingPipeline(ABC):
     def add_stage(self, stage: Any) -> None:
         self.stages.append(stage)
 
-    def run(self, data: Any) -> None:
-        res = data
+    def run(self, data: Any) -> Any:
+        res: Any = data
         try:
             for p in self.stages:
                 res = p.process(res)
@@ -46,28 +46,28 @@ class TransformStage:
 
 
 class OutputStage:
-    def process(self, data: Any) -> str:
+    def process(self, data: Any) -> Any:
         try:
             if not data:
                 raise ValueError("Output data error")
             if data["sensor"]:
-                val = data["value"]
-                unit = data["unit"]
-                res = "Processed temperature reading:"
+                val: float = data["value"]
+                unit: str = data["unit"]
+                res: str = "Processed temperature reading:"
                 return f"{res} {val}°{unit} (Normal range)"
         except Exception:
             return data
 
 
-class JsonAdapter(ProcessingPipeline):
-    def __init__(self, pipeline_id: str):
+class JSONAdapter(ProcessingPipeline):
+    def __init__(self, pipeline_id: str) -> None:
         super().__init__(pipeline_id)
 
-    def process(self, data: Any) -> Union[str, Any]:
+    def process(self, data: Any) -> Union[int, Any]:
         if isinstance(data, dict):
             print(f"Input: {data}")
 
-        res = self.run(data)
+        res: Any = self.run(data)
         if not isinstance(data, dict):
             return 0
         print("Transform: Enriched with metadata and validation")
@@ -75,19 +75,20 @@ class JsonAdapter(ProcessingPipeline):
         return res
 
 
-class CsvAdapter(ProcessingPipeline):
-    def __init__(self, pipeline_id: str):
+class CSVAdapter(ProcessingPipeline):
+    def __init__(self, pipeline_id: str) -> None:
         super().__init__(pipeline_id)
 
-    def process(self, data: Any) -> Union[str, Any]:
+    def process(self, data: Any) -> Union[int, List[str]]:
         print(f'Input: "{data}"')
-        res = self.run(data)
+        res: Any = self.run(data)
         if not isinstance(data, str):
             return 0
 
         print("Transform: Parsed and structured data")
         res = res.split(',')
-        count = 0
+        count: int = 0
+        usr: str = ""
         for p in res:
             if p == "user":
                 usr = "user"
@@ -99,49 +100,46 @@ class CsvAdapter(ProcessingPipeline):
 
 
 class StreamAdapter(ProcessingPipeline):
-    def __init__(self, pipeline_id: str):
+    def __init__(self, pipeline_id: str) -> None:
         super().__init__(pipeline_id)
 
-    def process(self, data: Any) -> str:
+    def process(self, data: Any) -> Union[int, Any]:
         print("Input: Real-time sensor stream")
-        res = self.run(data)
-        if not isinstance(data, str):
-            return 0
+        res: Any = self.run(data)
 
         print("Transform: Aggregated and filtered")
         if isinstance(data, list):
-            avg = sum(data) / len(data) if data else 0
+            avg: float = sum(data) / len(data) if data else 0
             print(
                 f"Output: Stream summary: {len(data)} "
                 f"readings, avg: {avg:.1f}°C"
-                )
-
+            )
         return res
 
 
 class NexusManager:
-    def __init__(self, capacity: int = 100):
+    def __init__(self, capacity: int = 100) -> None:
         self.pipelines: Dict[str, ProcessingPipeline] = {}
-        self.capacity = capacity
-        self.n_processed = 0
+        self.capacity: int = capacity
+        self.n_processed: int = 0
 
     def add_pipeline(self, pipeline: ProcessingPipeline) -> None:
         self.pipelines[pipeline.pipeline_id] = pipeline
 
-    def get_pipeline(self, pipeline_id):
+    def get_pipeline(self, pipeline_id: str) -> Optional[ProcessingPipeline]:
         return self.pipelines.get(pipeline_id)
 
     def process_data(self, data: Any, pipeline_id: str) -> Any:
-        pipeline = self.get_pipeline(pipeline_id)
+        pipeline: Optional[ProcessingPipeline] = self.get_pipeline(pipeline_id)
         if pipeline:
-            res = pipeline.process(data)
+            res: Any = pipeline.process(data)
             self.n_processed += 1
             return res
         raise ValueError(f"Pipeline {pipeline_id} not found")
 
-    def chain_pipelines(self) -> Any:
-        letter = 'A'
-        len_pipe = self.n_processed
+    def chain_pipelines(self) -> None:
+        letter: str = 'A'
+        len_pipe: int = self.n_processed
         for p in range(0, len_pipe - 1):
             print(f"Pipeline {letter} -> ", end="")
             letter = chr(ord(letter) + 1)
@@ -153,16 +151,20 @@ if __name__ == "__main__":
 
     print("Initializing Nexus Manager...")
     print("Pipeline capacity: 1000 streams/second\n")
-    manager = NexusManager()
+    manager: NexusManager = NexusManager()
 
-    json = JsonAdapter("JSON_001")
-    json_data = {"sensor": "temp", "value": 23.5, "unit": "C"}
+    json: JSONAdapter = JSONAdapter("JSON_001")
+    json_data: Dict[str, Union[str, float]] = {
+        "sensor": "temp",
+        "value": 23.5,
+        "unit": "C"
+    }
 
-    csv = CsvAdapter("CSV_001")
-    csv_data = "user,action,timestamp"
+    csv: CSVAdapter = CSVAdapter("CSV_001")
+    csv_data: str = "user,action,timestamp"
 
-    stream = StreamAdapter("STREAM_001")
-    stream_data = [10, 20, 5, 36, 40]
+    stream: StreamAdapter = StreamAdapter("STREAM_001")
+    stream_data: List[int] = [10, 20, 5, 36, 40]
 
     print("Creating Data Processing Pipeline...")
     print("Stage 1: Input validation and parsing")
@@ -195,7 +197,7 @@ if __name__ == "__main__":
     print("\n=== Pipeline Chaining Demo ===")
 
     manager.chain_pipelines()
-    l_p = manager.n_processed
+    l_p: int = manager.n_processed
 
     print("Data flow: Raw -> Processed -> Analyzed -> Stored\n")
     print(f"Chain result: 100 records processed through {l_p}-stage pipeline")
@@ -203,8 +205,8 @@ if __name__ == "__main__":
 
     print("\n=== Error Recovery Test ===")
     print("Simulating pipeline failure...")
-    err = JsonAdapter("ERR_001")
-    err_data = 0
+    err: JSONAdapter = JSONAdapter("ERR_001")
+    err_data: int = 0
 
     err.add_stage(InputStage())
     err.add_stage(TransformStage())

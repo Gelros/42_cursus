@@ -67,7 +67,7 @@ class LogProcessor(DataProcessor):
 
     def process(self, data: str) -> str:
         if not self.validate(data):
-            raise ValueError("Invalid str data")  
+            raise ValueError("Invalid str data")
         type_mess, message = data.split(':', 1)
         res = f"[ALERT] {type_mess} level detected:{message}"
         return res
