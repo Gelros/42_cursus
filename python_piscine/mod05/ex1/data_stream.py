@@ -185,7 +185,7 @@ if __name__ == "__main__":
     manager.add_stream(trans)
     manager.add_stream(event)
     data: Dict[str, List[Any]] = {
-        "SENSOR_001": [("temp", 22.5), ("humidity", 65), ("pressure", 1013)],
+        "SENSOR_001": [("temp", 20), ("humidity", 65), ("pressure", 1013)],
         "TRANS_001": [("buy", 100), ("sell", 150), ("buy", 75)],
         "EVENT_001": ["login", "error", "logout"]
     }
