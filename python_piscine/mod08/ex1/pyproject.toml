@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "matrix"
+version = "0.1.0"
+description = "Matrix data analysis pipeline"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.1.0"
+numpy = "^1.24.0"
+matplotlib = "^3.7.2"
+requests = "^2.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
