@@ -40,12 +40,12 @@ def display_configuration(config: dict) -> None:
         print("Zion Network: Offline")
 
 
-def security_check(config: dict) -> None:
+def security_check() -> None:
     print("\nEnvironment security check:")
 
     print("[OK] No hardcoded secrets detected")
 
-    if os.path.exists(".env"):
+    if os.path.exists("ex2/.env"):
         print("[OK] .env file properly configured")
     else:
         print("[WARNING] .env file not found")
@@ -58,4 +58,4 @@ def security_check(config: dict) -> None:
 if __name__ == "__main__":
     config = load_configuration()
     display_configuration(config)
-    security_check(config)
+    security_check()
