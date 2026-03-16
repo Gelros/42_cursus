@@ -38,7 +38,7 @@ static int launch(char **av)
     param.n_compiles_required = atoi(av[6]);
     param.dongle_cooldown = atoi(av[7]);
     param.scheduler = av[8];
-    return (0); // plutard ca sera le lancement du programme ici
+    return (0);
 }
 
 int	main(int ac, char **av)

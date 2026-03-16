@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 typedef struct s_params
 {
@@ -54,3 +55,7 @@ void				push(t_heap *heap, int id, long priority);
 t_entry				extract(t_heap *heap);
 void				take_dongle(t_coder *coder, t_dongle *dongle);
 void				take_dongles(t_coder *coder);
+int					init(t_simu *simu, t_params *params);
+void				log_action(t_coder *coder, char *str);
+void				release_dongle(t_dongle *dongle);
+void				release_dongles(t_coder *coder);
