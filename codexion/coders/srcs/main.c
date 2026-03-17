@@ -40,16 +40,12 @@ static int	launch(char **av)
 	param.n_compiles_required = atoi(av[6]);
 	param.dongle_cooldown = atoi(av[7]);
 	param.scheduler = av[8];
-	printf("1 - params ok\n");
 	init(&simu, &param);
-	printf("2 - init ok\n");
 	pthread_create(&simu.thread, NULL, monitor_routine, &simu);
-	printf("3 - monitor ok\n");
 	i = -1;
 	while (++i < param.n_coders)
 		pthread_create(&simu.coders[i].thread, NULL, coder_routine, &simu.coders[i]);
 	pthread_join(simu.thread, NULL);
-	printf("3 - coder ok\n");
 	i = -1;
 	while (++i < param.n_coders)
 		pthread_join(simu.coders[i].thread, NULL);

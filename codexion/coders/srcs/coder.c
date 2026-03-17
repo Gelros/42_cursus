@@ -18,22 +18,29 @@ void	refactor(t_coder *coder)
 	usleep(coder->simu->params->t_refactor * 1000);
 }
 
-void	*coder_routine(void *arg)
+void    *coder_routine(void *arg)
 {
-	t_coder *coder = (t_coder *)arg;
-	while (coder->simu->is_running)
-	{
-		take_dongles(coder);
-		coder->last_compile = get_time_ms();
-		compile(coder);
-		coder->n_compiles++;
-		release_dongles(coder);
-		if (!is_running(coder->simu))
-			break ;
-		debug(coder);
-		if (!is_running(coder->simu))
-			break ;
-		refactor(coder);
-	}
-	return (NULL);
+    t_coder *coder = (t_coder *)arg;
+
+    while (is_running(coder->simu))
+    {
+        if (!take_dongles(coder))
+            break ;
+        if (!is_running(coder->simu))
+        {
+            release_dongles(coder);
+            break ;
+        }
+        coder->last_compile = get_time_ms();
+        compile(coder);
+        coder->n_compiles++;
+        release_dongles(coder);
+        if (!is_running(coder->simu))
+            break ;
+        debug(coder);
+        if (!is_running(coder->simu))
+            break ;
+        refactor(coder);
+    }
+    return (NULL);
 }

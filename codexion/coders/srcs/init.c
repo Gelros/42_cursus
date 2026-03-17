@@ -11,13 +11,15 @@ int	init(t_simu *simu, t_params *params)
 	if (!simu->coders || !simu->dongles)
 		return (free(simu->coders), 1);
 	simu->is_running = 1;
+	simu->params = params;
+	simu->start_time = get_time_ms();
 	i = -1;
 	while (++i < params->n_coders)
 	{
 		pthread_mutex_init(&simu->dongles[i].mutex, NULL);
 		pthread_cond_init(&simu->dongles[i].cond, NULL);
 		simu->dongles[i].in_use = 0;
-		simu->dongles[i].released_at = 0;
+		simu->dongles[i].released_at = get_time_ms() - params->dongle_cooldown;
 		simu->dongles[i].queue.size = 0;
 		simu->dongles[i].id = i;
 		simu->coders[i].id = i + 1;
@@ -27,5 +29,5 @@ int	init(t_simu *simu, t_params *params)
 		simu->coders[i].right = &simu->dongles[(i + 1) % params->n_coders];
 		simu->coders[i].simu = simu;
 	}
-    return (0);
+	return (0);
 }

@@ -43,6 +43,7 @@ typedef struct s_coder
 
 typedef struct s_simu
 {
+	long				start_time;
 	t_dongle			*dongles;
 	t_coder				*coders;
 	t_params			*params;
@@ -55,8 +56,8 @@ typedef struct s_simu
 long					get_time_ms(void);
 void					push(t_heap *heap, int id, long priority);
 t_entry					extract(t_heap *heap);
-void					take_dongle(t_coder *coder, t_dongle *dongle);
-void					take_dongles(t_coder *coder);
+int						take_dongle(t_coder *coder, t_dongle *dongle);
+int						take_dongles(t_coder *coder);
 int						init(t_simu *simu, t_params *params);
 void					log_action(t_coder *coder, char *str);
 void					release_dongle(t_dongle *dongle);

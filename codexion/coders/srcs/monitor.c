@@ -3,6 +3,7 @@
 int	is_burnout(t_coder *coder, t_simu *simu)
 {
 	long	time_coder;
+	int		i;
 
 	time_coder = get_time_ms() - coder->last_compile;
 	if (time_coder >= simu->params->t_burnout)
@@ -10,6 +11,9 @@ int	is_burnout(t_coder *coder, t_simu *simu)
 		log_action(coder, "burned out");
 		pthread_mutex_lock(&simu->mutex_run);
 		simu->is_running = 0;
+		i = -1;
+		while (++i < simu->params->n_coders)
+			pthread_cond_broadcast(&simu->dongles[i].cond);
 		pthread_mutex_unlock(&simu->mutex_run);
 		return (1);
 	}
@@ -39,15 +43,18 @@ void	*monitor_routine(void *arg)
 	{
 		i = -1;
 		while (++i < simu->params->n_coders)
-		{
 			if (is_burnout(&simu->coders[i], simu))
 				break ;
-		}
+		if (!is_running(simu)) // ← burnout détecté, on sort
+			break ;
 		if (all_done(simu))
 		{
 			pthread_mutex_lock(&simu->mutex_run);
 			simu->is_running = 0;
 			pthread_mutex_unlock(&simu->mutex_run);
+			i = -1;
+			while (++i < simu->params->n_coders)
+				pthread_cond_broadcast(&simu->dongles[i].cond);
 			break ;
 		}
 		usleep(1000);
