@@ -16,16 +16,6 @@ int	is_burnout(t_coder *coder, t_simu *simu)
 	return (0);
 }
 
-int	is_running(t_simu *simu)
-{
-	int	running;
-
-	pthread_mutex_lock(&simu->mutex_run);
-	running = simu->is_running;
-	pthread_mutex_unlock(&simu->mutex_run);
-	return (running);
-}
-
 int	all_done(t_simu *simu)
 {
 	int	i;

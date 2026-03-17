@@ -26,24 +26,39 @@ static int	parsing(int ac, char **av)
 	return (0);
 }
 
-static int launch(char **av)
+static int	launch(char **av)
 {
-    t_params param;
+	t_params	param;
+	t_simu		simu;
+	int			i;
 
-    param.n_coders = atoi(av[1]);
-    param.t_burnout = atoi(av[2]);
-    param.t_compile = atoi(av[3]);
-    param.t_debug = atoi(av[4]);
-    param.t_refactor = atoi(av[5]);
-    param.n_compiles_required = atoi(av[6]);
-    param.dongle_cooldown = atoi(av[7]);
-    param.scheduler = av[8];
-    return (0);
+	param.n_coders = atoi(av[1]);
+	param.t_burnout = atoi(av[2]);
+	param.t_compile = atoi(av[3]);
+	param.t_debug = atoi(av[4]);
+	param.t_refactor = atoi(av[5]);
+	param.n_compiles_required = atoi(av[6]);
+	param.dongle_cooldown = atoi(av[7]);
+	param.scheduler = av[8];
+	printf("1 - params ok\n");
+	init(&simu, &param);
+	printf("2 - init ok\n");
+	pthread_create(&simu.thread, NULL, monitor_routine, &simu);
+	printf("3 - monitor ok\n");
+	i = -1;
+	while (++i < param.n_coders)
+		pthread_create(&simu.coders[i].thread, NULL, coder_routine, &simu.coders[i]);
+	pthread_join(simu.thread, NULL);
+	printf("3 - coder ok\n");
+	i = -1;
+	while (++i < param.n_coders)
+		pthread_join(simu.coders[i].thread, NULL);
+	free_all(&simu);
+	return (0);
 }
 
 int	main(int ac, char **av)
 {
-
 	if (ac != 9)
 	{
 		printf("Veuillez entrer le bon nombre d'arguments...\n");
@@ -51,10 +66,10 @@ int	main(int ac, char **av)
 		return (1);
 	}
 	if (parsing(ac, av))
-    {
-        printf("Arguments invalides\n");
-        return (1);
-    }
+	{
+		printf("Arguments invalides\n");
+		return (1);
+	}
 	launch(av);
 	return (0);
 }

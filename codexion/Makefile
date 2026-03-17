@@ -17,7 +17,6 @@ SRCS		:= $(SRCS_DIR)/main.c		\
 			   $(SRCS_DIR)/init.c		\
 			   $(SRCS_DIR)/coder.c		\
 			   $(SRCS_DIR)/dongle.c		\
-			   $(SRCS_DIR)/scheduler.c	\
 			   $(SRCS_DIR)/monitor.c	\
 			   $(SRCS_DIR)/log.c		\
 			   $(SRCS_DIR)/time_utils.c	\
