@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/21 11:01:13 by guilacol          #+#    #+#             */
+/*   Updated: 2026/03/21 11:28:53 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/codexion.h"
 
 void	push(t_heap *heap, int id, long priority)
@@ -8,12 +20,10 @@ void	push(t_heap *heap, int id, long priority)
 
 	if (heap->size >= 64)
 		return ;
-	// Place l'element a la fin
 	i = heap->size;
 	heap->entries[i].id = id;
 	heap->entries[i].priority = priority;
 	heap->size++;
-	// Sift-Up : Faire remonter l'élément
 	while (i > 0)
 	{
 		parent = (i - 1) / 2;
@@ -29,43 +39,38 @@ void	push(t_heap *heap, int id, long priority)
 	}
 }
 
-t_entry extract(t_heap *heap)
+static void	swap_down(t_heap *heap, int i)
 {
-    if (heap->size == 0)  // Cas ou la heap est vide on renvoie -1 -1 pour le signaler id/priority
-    {
-        t_entry empty = {-1, -1};
-        return (empty);
-    }
+	t_entry	tmp;
+	int		s;
 
-    t_entry root = heap->entries[0];
+	while (1)
+	{
+		s = i;
+		if (i * 2 + 1 < heap->size && heap->entries[i * 2 + 1].priority
+			< heap->entries[s].priority)
+			s = i * 2 + 1;
+		if (i * 2 + 2 < heap->size && heap->entries[i * 2 + 2].priority
+			< heap->entries[s].priority)
+			s = i * 2 + 2;
+		if (s == i)
+			break ;
+		tmp = heap->entries[i];
+		heap->entries[i] = heap->entries[s];
+		heap->entries[s] = tmp;
+		i = s;
+	}
+}
 
-    heap->size--;
-    if (heap->size > 0)
-        heap->entries[0] = heap->entries[heap->size]; // 2. Le dernier prend la place
-    
-    int i = 0;
-    while (1)
-    {
-        int left = (i * 2) + 1;
-        int right = (i * 2) + 2;
-        int smallest = i;
-        
-        // On regarde si l'un des enfant est plus important
-        if (left < heap->size && heap->entries[left].priority < heap->entries[smallest].priority)
-            smallest = left;
-        if (right < heap->size && heap->entries[right].priority < heap->entries[smallest].priority)
-            smallest = right;
+t_entry	extract(t_heap *heap)
+{
+	t_entry	root;
 
-        // Si jamais l'un des enfant est plus important que le parent on swap
-        if (smallest != i)
-        {
-            t_entry tmp = heap->entries[i];
-            heap->entries[i] = heap->entries[smallest];
-            heap->entries[smallest] = tmp;
-            i = smallest;
-        }
-        else
-            break;
-    }
-    return root;
+	if (heap->size <= 0)
+		return ((t_entry){-1, -1});
+	root = heap->entries[0];
+	heap->entries[0] = heap->entries[--heap->size];
+	if (heap->size > 0)
+		swap_down(heap, 0);
+	return (root);
 }

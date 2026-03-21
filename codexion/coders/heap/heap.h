@@ -1,11 +1,23 @@
-typedef struct s_entry // Structre de donnée pour Thread
-{
-    int     id;       // ID du thread
-    long    priority; // Timestamp/Deadline : définit l'ordre de passage dans le Heap
-} t_entry;
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/21 11:23:10 by guilacol          #+#    #+#             */
+/*   Updated: 2026/03/21 11:23:12 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-typedef struct s_heap // Structure qui sert de dicionnaire pour les Threads
+typedef struct s_entry
 {
-    t_entry entries[64]; // Tableau représentant l'arbre binaire (max 64 éléments)
-    int     size;       // Nombre actuel d'éléments stockés dans le tas
-} t_heap;
+	int		id;
+	long	priority;
+}			t_entry;
+
+typedef struct s_heap
+{
+	t_entry	entries[64];
+	int		size;
+}			t_heap;

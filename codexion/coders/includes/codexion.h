@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   codexion.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/21 11:23:25 by guilacol          #+#    #+#             */
+/*   Updated: 2026/03/21 11:23:27 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../heap/heap.h"
 #include <pthread.h>
 #include <stdio.h>
@@ -39,6 +51,7 @@ typedef struct s_coder
 	t_dongle			*right;
 	pthread_t			thread;
 	t_simu				*simu;
+	pthread_mutex_t		mutex;
 }						t_coder;
 
 typedef struct s_simu

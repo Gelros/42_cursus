@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/21 10:48:22 by guilacol          #+#    #+#             */
+/*   Updated: 2026/03/21 11:19:35 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/codexion.h"
 
 static int	parsing(int ac, char **av)
@@ -44,7 +56,8 @@ static int	launch(char **av)
 	pthread_create(&simu.thread, NULL, monitor_routine, &simu);
 	i = -1;
 	while (++i < param.n_coders)
-		pthread_create(&simu.coders[i].thread, NULL, coder_routine, &simu.coders[i]);
+		pthread_create(&simu.coders[i].thread, NULL, coder_routine,
+			&simu.coders[i]);
 	pthread_join(simu.thread, NULL);
 	i = -1;
 	while (++i < param.n_coders)

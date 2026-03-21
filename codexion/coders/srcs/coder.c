@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   coder.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guilacol <guilacol@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/21 10:47:49 by guilacol          #+#    #+#             */
+/*   Updated: 2026/03/21 11:29:45 by guilacol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/codexion.h"
 
 void	compile(t_coder *coder)
@@ -18,29 +30,39 @@ void	refactor(t_coder *coder)
 	usleep(coder->simu->params->t_refactor * 1000);
 }
 
-void    *coder_routine(void *arg)
+static void	do_compile(t_coder *coder)
 {
-    t_coder *coder = (t_coder *)arg;
+	pthread_mutex_lock(&coder->mutex);
+	coder->last_compile = get_time_ms();
+	pthread_mutex_unlock(&coder->mutex);
+	compile(coder);
+	pthread_mutex_lock(&coder->mutex);
+	coder->n_compiles++;
+	pthread_mutex_unlock(&coder->mutex);
+}
 
-    while (is_running(coder->simu))
-    {
-        if (!take_dongles(coder))
-            break ;
-        if (!is_running(coder->simu))
-        {
-            release_dongles(coder);
-            break ;
-        }
-        coder->last_compile = get_time_ms();
-        compile(coder);
-        coder->n_compiles++;
-        release_dongles(coder);
-        if (!is_running(coder->simu))
-            break ;
-        debug(coder);
-        if (!is_running(coder->simu))
-            break ;
-        refactor(coder);
-    }
-    return (NULL);
+void	*coder_routine(void *arg)
+{
+	t_coder	*coder;
+
+	coder = (t_coder *)arg;
+	while (is_running(coder->simu))
+	{
+		if (!take_dongles(coder))
+			break ;
+		if (!is_running(coder->simu))
+		{
+			release_dongles(coder);
+			break ;
+		}
+		do_compile(coder);
+		release_dongles(coder);
+		if (!is_running(coder->simu))
+			break ;
+		debug(coder);
+		if (!is_running(coder->simu))
+			break ;
+		refactor(coder);
+	}
+	return (NULL);
 }
