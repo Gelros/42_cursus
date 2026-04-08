@@ -1,0 +1,10 @@
+nb_drones: 3
+start_hub: depart 0 0 [color=green]
+end_hub: arrivee 5 5 [color=yellow]
+hub: A 1 2 [zone=normal color=blue]
+hub: B 3 3 [zone=restricted max_drones=2]
+hub: C 2 4 [zone=blocked]
+connection: depart-A
+connection: A-B [max_link_capacity=2]
+connection: B-arrivee
+# ceci est un commentaire
