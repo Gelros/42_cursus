@@ -19,6 +19,9 @@ clean:
 fclean: clean
 	rm -rf .venv
 	rm -f uv.lock
+	rm -rf data/output
+
+re: fclean install
 
 lint:
 	uv run flake8 .

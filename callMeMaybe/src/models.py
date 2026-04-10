@@ -1,11 +1,12 @@
-from pydantic import BaseModel, Field, ValidationError
-import json
+from pydantic import BaseModel, Field
 
 class ParameterDef(BaseModel):
+    """Defines a single parameter or return type."""
     type: str
     
 
 class FunctionDef(BaseModel):
+    """Schema for a function that the AI can call."""
     name: str
     description: str
     parameters: dict[str, ParameterDef]
@@ -13,23 +14,12 @@ class FunctionDef(BaseModel):
 
 
 class TestPrompt(BaseModel):
+    """Simple wrapper for a test prompt string."""
     prompt: str
 
 
 class FunctionCall(BaseModel):
+    """Represents an AI's decision to call a specific function."""
     prompt: str
     name: str = Field(..., min_length=1)
     parameters: dict
-
-
-def load_functions_def(path: str) -> list[FunctionDef]:
-    with open(path, 'r') as e:
-        res = json.load(e)
-
-    funcs = []
-    try:
-        for raw in res:
-            funcs.append(FunctionDef(**raw))
-    except ValidationError as e:
-        print("Model Pydantic invalide", e)
-    return funcs
