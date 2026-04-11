@@ -18,60 +18,69 @@ class JsonState(Enum):
 
 @dataclass
 class GenerationContext:
-    state        : JsonState # Savoir où nous en sommes dans la structure JSON
-    functions    : list[FunctionDef] # Liste de toutes les fonctions disponibles
-    func_tokens  : dict[str, list[int]] # Les noms de fonctions déjà convertis en IDs
-    chosen_func  : FunctionDef | None = None # La fonction que l'IA a fini par choisir
-    tokens_so_far: list[int] = field(default_factory=list) # Historique des chiffres générés par l'IA
-    params_done  : list[str] = field(default_factory=list) # Noms des paramètres déjà remplis
-    current_param: str | None = None # Le paramètre qu'on est en train de remplir actuellement
+    state        : JsonState                    # Où on en est dans la structure JSON
+    functions    : list[FunctionDef]            # Toutes les fonctions disponibles
+    func_tokens  : dict[str, list[int]]         # Noms de fonctions convertis en IDs
+    chosen_func  : FunctionDef | None = None    # Fonction choisie par l'IA
+    tokens_so_far: list[int] = field(default_factory=list)  # Tokens générés pour le nom courant
+    params_done  : list[str] = field(default_factory=list)  # Paramètres déjà remplis
+    current_param: str | None = None            # Paramètre en cours de remplissage
+    current_value: str = ""                     # Valeur en cours de génération (number/bool)
 
 def _get_number_tokens(
     vocab: dict[str, int],
-    tokens_so_far: list[int],
-    id_to_token: dict[int, str],
+    current_value: str,
 ) -> list[int]:
-    generated = "".join(id_to_token[i] for i in tokens_so_far)
-    has_dot = '.' in generated
-    res = []
-    for token, id in vocab.items():
+    """Retourne les token IDs valides pour générer un nombre.
+
+    Args:
+        vocab: Vocabulaire token -> ID.
+        current_value: La valeur numérique déjà générée (ex: "2", "2.").
+
+    Returns:
+        Liste des token IDs autorisés.
+    """
+    has_dot = "." in current_value
+    has_exp = "e" in current_value.lower()
+    res: list[int] = []
+
+    for token, tid in vocab.items():
         t = token.strip()
-        if not t: continue
+        if not t:
+            continue
+        if t[0].isdigit() or t.lstrip("-").isdigit():
+            res.append(tid)
+        elif not has_dot and not has_exp and t == ".":
+            res.append(tid)
+        elif t in (",", "}"):
+            res.append(tid)
 
-        if t[0].isdigit(): res.append(id)
-
-        elif t.lstrip('-').isdigit(): res.append(id)
-
-        elif t == '-': res.append(id)
-
-        elif not has_dot and t == '.': res.append(id)
-
-        elif t in ('}', ','): res.append(id)
     return res
 
 def get_valid_tokens(
-    context: GenerationContext,
+    ctx: GenerationContext,
     vocab: dict[str, int],
-    model: Small_LLM_Model
+    model: Small_LLM_Model,
+    id_to_token: dict[int, str]
 ) -> list[int]:
-    if context.state == JsonState.START:
+    if ctx.state == JsonState.START:
         return [vocab['{']]
-    if context.state == JsonState.NAME:
+    if ctx.state == JsonState.NAME:
         valid = []
-        for name, token_ids in context.func_tokens.items():
-            n = len(context.tokens_so_far)
-            if token_ids[:n] == context.tokens_so_far and n < len(token_ids):
+        for name, token_ids in ctx.func_tokens.items():
+            n = len(ctx.tokens_so_far)
+            if token_ids[:n] == ctx.tokens_so_far and n < len(token_ids):
                 valid.append(token_ids[n])
                 return valid
         if not valid:
             raise ValueError("Token invalid")
             
-    if context.state == JsonState.PARAM_KEY:
-        n = len(context.tokens_so_far)
-        if context.chosen_func:
+    if ctx.state == JsonState.PARAM_KEY:
+        n = len(ctx.tokens_so_far)
+        if ctx.chosen_func:
             allowed = [
-                p for p in context.chosen_func.parameters.keys()
-                if p not in context.params_done
+                p for p in ctx.chosen_func.parameters.keys()
+                if p not in ctx.params_done
             ]
         else:
             raise ValueError("Pas de fonction choisie")
@@ -81,23 +90,98 @@ def get_valid_tokens(
         if n < len(ids):
             return [ids[n]]
     
-    if context.state == JsonState.PARAM_VAL:
-        type_of_param = context.chosen_func.parameters[context.current_param].type
-        if isinstance(type_of_param, bool):
+    if ctx.state == JsonState.PARAM_VAL:
+        type_of_param = ctx.chosen_func.parameters[ctx.current_param].type
+        if type_of_param == "boolean":
             return [vocab["true"], vocab["false"]]
-        elif isinstance(type_of_param, str):
+        elif type_of_param == "string":
             return [vocab['"']]
-        elif isinstance(type_of_param, int, float):
-            return _get_number_tokens(vocab, context.tokens_so_far, id_to_tokens)
+        elif type_of_param == "number":
+            return _get_number_tokens(vocab, ctx.current_value)
     
-    if context.state == JsonState.IN_STRING:
+    if ctx.state == JsonState.IN_STRING:
         quote_id = vocab['"']
         return [v for k, v in vocab.items() if v != quote_id]
+
+    if ctx.state == JsonState.PARAM_NEXT:
+        if len(ctx.params_done) != len(ctx.chosen_func.parameters):
+            return [vocab[',']]
+        return [vocab['}']]
             
 
 
-def _updtate_state(context: GenerationContext, token_str: str) -> None:
-    ...
+def _update_state(
+    ctx: GenerationContext,
+    token_id: int,
+    id_to_token: dict[int, str],
+    model: Small_LLM_Model,
+) -> None:
+    """Met à jour le contexte après chaque token généré.
+
+    Args:
+        ctx: Contexte de génération (modifié en place).
+        token_id: ID du token qui vient d'être généré.
+        id_to_token: Table inverse ID -> token string.
+        model: Instance du modèle (pour encoder les noms de paramètres).
+    """
+    token_str = id_to_token.get(token_id, "")
+
+    if ctx.state == JsonState.NAME:
+        ctx.tokens_so_far.append(token_id)
+        for func_name, token_ids in ctx.func_tokens.items():
+            if ctx.tokens_so_far == token_ids:
+                ctx.chosen_func = next(
+                    f for f in ctx.functions if f.name == func_name
+                )
+                ctx.state = JsonState.PARAM_KEY
+                ctx.tokens_so_far = []
+                return
+
+    elif ctx.state == JsonState.PARAM_KEY:
+        ctx.tokens_so_far.append(token_id)
+        # Trouver le prochain paramètre attendu
+        all_params = list(ctx.chosen_func.parameters.keys())
+        remaining = [p for p in all_params if p not in ctx.params_done]
+        if not remaining:
+            return
+        next_param = remaining[0]
+        param_ids = model.encode(next_param)[0].tolist()
+        # Nom complet ?
+        if ctx.tokens_so_far == param_ids:
+            ctx.current_param = next_param
+            ctx.tokens_so_far = []
+            ctx.state = JsonState.PARAM_VAL
+
+    elif ctx.state == JsonState.PARAM_VAL:
+        ptype = ctx.chosen_func.parameters[ctx.current_param].type
+        if ptype == "string":
+            # Le " ouvre la string → passer en IN_STRING
+            ctx.state = JsonState.IN_STRING
+        else:
+            # number ou boolean → accumuler et détecter la fin
+            ctx.current_value += token_str
+            if token_str.strip() in (",", "}"):
+                ctx.params_done.append(ctx.current_param)
+                ctx.current_param = None
+                ctx.current_value = ""
+                ctx.state = JsonState.PARAM_NEXT
+
+    elif ctx.state == JsonState.IN_STRING:
+        # Le " fermant termine la string
+        if token_str == '"':
+            ctx.params_done.append(ctx.current_param)
+            ctx.current_param = None
+            ctx.current_value = ""
+            ctx.state = JsonState.PARAM_NEXT
+
+    elif ctx.state == JsonState.PARAM_NEXT:
+        if token_str.strip() == ",":
+            ctx.tokens_so_far = []
+            ctx.state = JsonState.PARAM_KEY
+        elif token_str.strip() == "}":
+            ctx.state = JsonState.END
+            
+        
 
 
 def apply_mask(logits: np.ndarray, allowed_ids: list[int]) -> np.ndarray:
