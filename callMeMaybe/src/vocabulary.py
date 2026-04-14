@@ -7,7 +7,7 @@ def load_vocab(model: Small_LLM_Model) -> dict[str, int]:
     """Load vocabulary from LLM_MODEL in dictionary."""
     path = model.get_path_to_tokenizer_file()
     try:
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             tokens_data = json.load(f)
     except FileNotFoundError:
         raise FileNotFoundError(f"Fichier vocabulaire introuvable : {path}")
@@ -17,15 +17,15 @@ def load_vocab(model: Small_LLM_Model) -> dict[str, int]:
         return tokens_data["model"]["vocab"]
     except KeyError as e:
         raise ValueError(f"Structure tokenizer inattendue : {e}")
-    
+
 
 def id_to_tokens(vocab: dict[str, int]) -> dict[int, str]:
     """Return dictionnary (id: token) from LLM vocabulary"""
     return {v: k for k, v in vocab.items()}
 
+
 def pre_calc_name_func(
-    functions: list[FunctionDef],
-    model: Small_LLM_Model
+    functions: list[FunctionDef], model: Small_LLM_Model
 ) -> dict[str, list[int]]:
     """Pre-calculate the token IDs for each function name."""
     result: dict[str, list[int]] = {}
