@@ -1,12 +1,15 @@
 from pydantic import BaseModel, Field
 
+
 class ParameterDef(BaseModel):
-    """Defines a single parameter or return type."""
+    """Single parameter schema."""
+
     type: str
-    
+
 
 class FunctionDef(BaseModel):
-    """Schema for a function that the AI can call."""
+    """Callable function schema."""
+
     name: str
     description: str
     parameters: dict[str, ParameterDef]
@@ -14,12 +17,14 @@ class FunctionDef(BaseModel):
 
 
 class TestPrompt(BaseModel):
-    """Simple wrapper for a test prompt string."""
+    """Input prompt wrapper."""
+
     prompt: str
 
 
 class FunctionCall(BaseModel):
-    """Represents an AI's decision to call a specific function."""
+    """Function call output item."""
+
     prompt: str
     name: str = Field(..., min_length=1)
-    parameters: dict
+    parameters: dict[str, object]

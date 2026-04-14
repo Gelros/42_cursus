@@ -2,6 +2,7 @@
 exclude = 
     .venv,
     .git,
+    .claude,
     __pycache__,
     build,
     dist

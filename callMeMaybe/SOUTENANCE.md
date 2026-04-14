@@ -2,95 +2,74 @@
 
 ## Pitch rapide (30-45s)
 
-Ce projet prend des prompts en langage naturel et produit une sortie JSON structuree qui decrit une decision de function calling.  
-Pour chaque prompt, je retourne un objet avec `prompt`, `name`, et `parameters`, conforme au schema des fonctions disponibles.  
-J'ai organise le code en trois blocs: chargement/validation des donnees, generation de la decision, et orchestration CLI.
+Ce projet transforme des prompts en langage naturel en decisions de function
+calling au format JSON. Pour chaque prompt, la sortie contient `prompt`, `name`
+et `parameters`, en respectant le schema des fonctions chargees.
 
-## Objectif du projet
+## Objectifs du projet
 
-- Transformer une demande utilisateur en appel de fonction exploitable par une machine.
-- Garantir une sortie JSON parseable.
-- Respecter les types attendus par le schema (`number`, `string`, `boolean`).
-- Gérer proprement les erreurs d'entree et d'execution.
+- Convertir un texte utilisateur en appel de fonction exploitable par une machine.
+- Garder une sortie JSON valide et coherente.
+- Respecter les types attendus (`number`, `string`, `boolean`).
+- Echouer rapidement avec des erreurs explicites.
 
-## Architecture du projet
+## Architecture
 
-- `src/models.py`
-  - Modeles Pydantic (`FunctionDef`, `TestPrompt`, `FunctionCall`)
-  - Validation structurelle des donnees
-- `src/loader.py`
-  - Chargement des fichiers JSON d'entree
-  - Gestion des erreurs JSON/fichiers manquants
-  - Sauvegarde du resultat final
-- `src/generator.py`
-  - Logique de selection de fonction
-  - Construction des parametres selon le schema
-- `src/__main__.py`
-  - Point d'entree CLI
-  - Boucle sur tous les prompts
-  - Ecriture du fichier de sortie
+- `src/models.py`: schemas Pydantic (`FunctionDef`, `TestPrompt`, `FunctionCall`)
+- `src/loader.py`: gestion des fichiers JSON avec validation
+- `src/generator.py`: selection de fonction et generation des parametres
+- `src/__main__.py`: orchestration CLI et traitement en lot
+- `llm_sdk/__init__.py`: chargement du modele local et inférence
 
 ## Pipeline d'execution
 
-1. Charger `functions_definition.json` et `function_calling_tests.json`.
+1. Charger `functions_definition.json` et les prompts de test.
 2. Initialiser le modele.
-3. Pour chaque prompt:
+3. Pour chaque prompt :
    - choisir la fonction cible,
-   - construire `parameters` conformes au schema,
-   - instancier un `FunctionCall`.
-4. Ecrire tous les resultats dans `data/output/function_calling_results.json`.
+   - generer des parametres types,
+   - construire un `FunctionCall`.
+4. Sauvegarder tous les resultats dans `data/output/function_calling_results.json`.
 
 ## Choix techniques defensables
 
-- Utilisation de Pydantic pour fiabiliser les structures de donnees.
-- Separation nette des responsabilites (models, loader, generator, main).
-- Gestion explicite des exceptions pour eviter les crashs silencieux.
-- Sortie JSON strictement formatee et directement exploitable.
+- Pydantic garantit la validation des schemas.
+- Separation claire des responsabilites par module.
+- Gestion explicite des exceptions pour les entrees invalides.
+- Fallbacks deterministes quand la generation LLM est instable.
 
 ## Gestion des erreurs
 
-- Fichier introuvable -> `FileNotFoundError` avec message clair.
-- JSON invalide -> `ValueError` explicite.
-- Donnees non conformes au schema -> erreur de validation Pydantic.
-- Cas d'extraction impossible -> erreur metier explicite.
+- Fichier manquant -> `FileNotFoundError`
+- JSON invalide -> `ValueError`
+- Schema invalide -> erreur de validation Pydantic
+- Etat de generation invalide -> erreur d'execution explicite
 
-## Commandes de demonstration
+## Commandes de demo
 
 ```bash
-uv sync
+make install
 make run
+make lint
 ```
 
-ou:
+## Ce qu'il faut montrer en soutenance
 
-```bash
-uv run python -m src \
-  --functions_definition data/input/functions_definition.json \
-  --input data/input/function_calling_tests.json \
-  --output data/output/function_calling_results.json
-```
+- Format des fichiers d'entree et schema.
+- Transformation d'un prompt en `FunctionCall`.
+- Validite du JSON de sortie.
+- Verification statique avec `flake8` et `mypy`.
 
-## Ce que je montre pendant la soutenance
-
-- Le format des fichiers d'entree.
-- Le passage prompt -> `FunctionCall`.
-- Le fichier de sortie final et sa validite JSON.
-- La conformite des types de `parameters` avec le schema.
-
-## Questions probables et reponses courtes
+## Q&R rapide
 
 - **Pourquoi Pydantic ?**  
-  Pour valider automatiquement les structures et echouer proprement en cas de schema incorrect.
+  Il valide les contrats de donnees et echoue clairement quand elles sont invalides.
 
-- **Comment garantis-tu la robustesse ?**  
-  Validation stricte des entrees, erreurs explicites, et generation controlee de la sortie.
+- **Comment garantir la robustesse ?**  
+  Verifications strictes en entree, erreurs explicites et fallbacks deterministes.
 
-- **Comment verifier la conformite du resultat ?**  
-  Le resultat est une liste de `FunctionCall` valides, avec les cles attendues et des types conformes.
+- **Comment verifier la qualite de sortie ?**  
+  Modeles valides plus controles `flake8` et `mypy`.
 
-- **Que se passe-t-il si les prompts changent ?**  
-  Le pipeline reste le meme: selection de fonction puis generation des parametres selon le schema charge depuis le fichier de definitions.
-
-## Conclusion (10s)
-
-Le projet est structure, testable, et focalise sur la fiabilite: transformer du langage naturel en decisions de function calling JSON valides et exploitables.
+- **Que se passe-t-il avec de nouveaux prompts ?**  
+  Le meme pipeline s'applique, car le comportement est pilote par le schema d'entree.

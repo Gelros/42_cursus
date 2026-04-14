@@ -1,43 +1,44 @@
-*This project has been created by guilacol*
-
 # callMeMaybe
 
-## Description
+`callMeMaybe` converts natural language prompts into structured function-call
+objects.
 
-`callMeMaybe` is a function-calling pipeline that converts natural-language prompts into structured function-call objects.
+## What It Does
 
-The project reads:
-- a list of available function definitions (`name`, `description`, `parameters`, `returns`),
-- a list of prompts to process,
+The pipeline reads:
+- function definitions (`name`, `description`, `parameters`, `returns`)
+- prompt test cases
 
-and produces:
-- a JSON array of function-calling decisions with exactly:
-  - `prompt`
-  - `name`
-  - `parameters`
+And writes:
+- a JSON array of items with `prompt`, `name`, and `parameters`
 
-The goal is to make outputs machine-usable, schema-aware, and robustly formatted.
+## Project Layout
 
-## Instructions
+- `src/models.py`: Pydantic schemas
+- `src/loader.py`: JSON loading/saving with validation
+- `src/generator.py`: function and parameter generation
+- `src/__main__.py`: CLI entrypoint
+- `llm_sdk/__init__.py`: local model wrapper
 
-### Requirements
+## Setup
 
+Requirements:
 - Python 3.10+
-- `uv` for dependency management
+- `uv`
 
-### Install
+Install dependencies:
 
 ```bash
 make install
 ```
 
-### Run
+## Run
 
 ```bash
 make run
 ```
 
-or explicitly:
+or:
 
 ```bash
 uv run python -m src \
@@ -46,80 +47,19 @@ uv run python -m src \
   --output data/output/function_calling_results.json
 ```
 
-### Debug
+## Quality Checks
 
-```bash
-make debug
-```
-
-### Lint
+Run static checks:
 
 ```bash
 make lint
 ```
 
-## Algorithm Explanation
+This runs:
+- `flake8` for style
+- `mypy` for typing
 
-The pipeline follows these steps:
-
-1. **Load and validate input files**
-   - Function definitions and prompts are read from JSON files.
-   - Data is validated with Pydantic models.
-
-2. **Function selection**
-   - The model is used to score/select the target function name from the available set.
-
-3. **Parameter construction**
-   - Parameters are built according to the selected function schema.
-   - Type consistency is enforced (`number`, `string`, `boolean`, etc.).
-
-4. **Output generation**
-   - For each prompt, a `FunctionCall` object is created.
-   - All results are serialized to a valid JSON output file.
-
-This design prioritizes schema compliance and robust output formatting.
-
-## Design Decisions
-
-- **Pydantic-first data layer**: strict schema validation for inputs and outputs.
-- **Separated responsibilities**:
-  - `models.py` for data contracts,
-  - `loader.py` for I/O and serialization,
-  - `generator.py` for function-call generation logic,
-  - `__main__.py` for CLI orchestration.
-- **Fail-fast error handling**: explicit exceptions with readable messages for malformed files and invalid states.
-
-## Performance Analysis
-
-- **Speed**: processing the provided test set is fast on standard hardware.
-- **Reliability**:
-  - output JSON remains parseable,
-  - output objects keep required keys and expected structure.
-- **Trade-off**:
-  - with a small model, strict reliability may require additional constraints and deterministic safeguards around extraction/validation.
-
-## Challenges Faced
-
-- Preventing degenerate model outputs on small LLMs (repetitive tokens, unstable function choices).
-- Keeping strong schema correctness while maintaining model-driven behavior.
-- Handling environment/network constraints during model/tokenizer loading.
-
-## Testing Strategy
-
-- Run end-to-end generation on the full prompt set.
-- Manually validate output file structure:
-  - JSON validity,
-  - required keys per item,
-  - type consistency against function definitions.
-- Re-run after every major change in `generator.py`.
-- Use lint checks (`flake8`, `mypy`) to keep code quality stable.
-
-## Example Usage
-
-Input prompt:
-- `"What is the sum of 2 and 3?"`
-
-Expected output item shape:
+## Example Output
 
 ```json
 {
@@ -131,21 +71,3 @@ Expected output item shape:
   }
 }
 ```
-
-## Resources
-
-### Technical References
-
-- [Transformers Documentation](https://huggingface.co/docs/transformers/index)
-- [Hugging Face Hub Documentation](https://huggingface.co/docs/huggingface_hub/index)
-- [Pydantic Documentation](https://docs.pydantic.dev/)
-- [NumPy Documentation](https://numpy.org/doc/)
-
-### AI Usage Disclosure
-
-AI assistance was used for:
-- architecture iteration and refactoring suggestions,
-- debugging strategy proposals,
-- documentation drafting support.
-
-All generated suggestions were manually reviewed, adapted, and validated before integration.
