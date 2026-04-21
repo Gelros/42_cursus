@@ -274,8 +274,6 @@ callMeMaybe/
 ├── Makefile                 # install / run / debug / lint / clean / fclean
 ├── pyproject.toml           # uv project + mypy config
 ├── README.md                # this file
-├── SOUTENANCE.md            # defense notes (French)
-├── cours/                   # companion course PDFs
 ├── data/
 │   └── input/
 │       ├── functions_definition.json
@@ -302,8 +300,6 @@ Classic references on function calling, LLMs, and constrained decoding:
 - **Pydantic v2**: https://docs.pydantic.dev/
 - **NumPy**: https://numpy.org/doc/
 - **uv**: https://docs.astral.sh/uv/
-- **Log-sum-exp** (numerical stability):
-  https://en.wikipedia.org/wiki/LogSumExp
 - **BPE tokenization** — Sennrich et al., 2016, *"Neural Machine Translation
   of Rare Words with Subword Units"*
 - **Outlines / constrained decoding** (for context only; not used here):
@@ -320,8 +316,7 @@ adapted. Specifically:
   regex fallbacks, how to handle the decimal-truncation bug).
 - **Debugging.** Narrowing down edge cases such as the `a == b` bug on
   `"sum of 265 and 345"` and the decimal-truncation bug on `-3.5`.
-- **Documentation.** Drafting this README, the companion course PDFs in
-  `cours/`, and `SOUTENANCE.md`.
+- **Documentation.** Drafting this README, gives lessons.
 - **Refactoring hints.** Suggestions around Pydantic validators, modern
   Python type hints, `mypy --strict` compliance.
 
