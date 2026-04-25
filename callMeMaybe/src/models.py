@@ -2,13 +2,13 @@ from pydantic import BaseModel, Field
 
 
 class ParameterDef(BaseModel):
-    """Single parameter schema."""
+    """Parameter descriptor: holds the declared type string."""
 
     type: str
 
 
 class FunctionDef(BaseModel):
-    """Callable function schema."""
+    """Full definition of a callable function: name, description, parameters, return."""
 
     name: str
     description: str
@@ -17,13 +17,13 @@ class FunctionDef(BaseModel):
 
 
 class TestPrompt(BaseModel):
-    """Input prompt wrapper."""
+    """Single natural-language prompt to process."""
 
     prompt: str
 
 
 class FunctionCall(BaseModel):
-    """Function call output item."""
+    """Result of the pipeline: the selected function and its resolved arguments."""
 
     prompt: str
     name: str = Field(..., min_length=1)

@@ -12,7 +12,7 @@ logging.set_verbosity_error()  # type: ignore[no-untyped-call]  # keep the conso
 
 
 class Small_LLM_Model:
-    """Small wrapper around a local Hugging Face causal model."""
+    """Wrapper around a local Hugging Face causal LM (default: Qwen3-0.6B)."""
 
     def __init__(
         self,
@@ -22,6 +22,7 @@ class Small_LLM_Model:
         dtype: torch.dtype | None = None,
         trust_remote_code: bool = True,
     ) -> None:
+        """Load the tokenizer and model, auto-selecting the best available device."""
         self._model_name = model_name
 
         # Auto-select device with priority: mps > cuda > cpu
@@ -81,6 +82,7 @@ class Small_LLM_Model:
         return [float(x) for x in logits]
 
     def get_path_to_vocab_file(self) -> str:
+        """Download and return the local path to the model's vocab.json file."""
         vocab_file_name = self._tokenizer.vocab_files_names.get(
             "vocab_file", "vocab.json"
         )
@@ -91,6 +93,7 @@ class Small_LLM_Model:
         return vocab_path
 
     def get_path_to_merges_file(self) -> str:
+        """Download and return the local path to the model's merges.txt BPE file."""
         merges_file_name = self._tokenizer.vocab_files_names.get(
             "merges_file", "merges.txt"
         )
@@ -101,6 +104,7 @@ class Small_LLM_Model:
         return merges_path
 
     def get_path_to_tokenizer_file(self) -> str:
+        """Download and return the local path to the model's tokenizer.json file."""
         tokenizer_file_name = self._tokenizer.vocab_files_names.get(
             "tokenizer_file", "tokenizer.json"
         )

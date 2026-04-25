@@ -17,12 +17,16 @@ _STOPWORDS = {
 
 
 class JsonState(Enum):
+    """Tracks whether a function call has been fully generated."""
+
     START = auto()
     END = auto()
 
 
 @dataclass
 class GenerationContext:
+    """Holds all state needed to generate a single function call."""
+
     functions: list[FunctionDef]
     func_tokens: dict[str, list[int]]
     state: JsonState = JsonState.START
@@ -31,7 +35,7 @@ class GenerationContext:
 
 
 def _lexical_affinity(prompt: str, func: FunctionDef) -> float:
-    """Score overlap between prompt and function metadata."""
+    """Bonus score based on keyword overlap between prompt and function metadata."""
     lowered = prompt.lower()
     name_words = set(re.findall(r"[a-z]+", func.name.lower()))
     desc_words = set(re.findall(r"[a-z]+", func.description.lower()))
@@ -48,7 +52,7 @@ def _select_function_name(
     prompt: str,
     functions: list[FunctionDef],
 ) -> str:
-    """Select a function name from the prompt."""
+    """Select the best-matching function by teacher-forced scoring + lexical bonus."""
     preamble = (
         "You must pick exactly one function name for the user request.\n"
         f"User request: {prompt}\n"
@@ -88,13 +92,14 @@ def _select_function_name(
 
 
 def _extract_numbers_from_prompt(prompt: str) -> list[float]:
+    """Return all numbers (sign + decimals) found in the prompt, in order."""
     return [float(x) for x in re.findall(r"-?\d+(?:\.\d+)?", prompt)]
 
 
 def _fallback_number_value(
     prompt: str, param_name: str, param_index: int = 0
 ) -> float:
-    """Return a deterministic number from prompt values."""
+    """Return the i-th prompt number by position (hallucination/duplicate fallback)."""
     nums = _extract_numbers_from_prompt(prompt)
     if not nums:
         return 0.0
@@ -109,7 +114,7 @@ def _fallback_number_value(
 def _generate_number_value(
     model: Small_LLM_Model, prompt: str, param_name: str
 ) -> float:
-    """Generate one numeric parameter value."""
+    """Greedily decode a number token-by-token via a state machine; parse with regex."""
     base = (
         f"User request: {prompt}\n"
         "You are preparing function-call arguments.\n"
@@ -157,6 +162,7 @@ def _generate_number_value(
 def _generate_boolean_value(
     model: Small_LLM_Model, prompt: str, param_name: str
 ) -> bool:
+    """Compare the logits of 'true' and 'false' tokens and return the higher one."""
     q = (
         f"User request: {prompt}\n"
         f"Generate a boolean value for parameter '{param_name}'.\n"
@@ -177,6 +183,7 @@ def _generate_boolean_value(
 def _generate_string_value(
     model: Small_LLM_Model, prompt: str, param_name: str
 ) -> str:
+    """Greedily decode a string value until a newline, then strip surrounding quotes."""
     q = (
         f"User request: {prompt}\n"
         "You are preparing function-call arguments.\n"
@@ -202,6 +209,7 @@ def _generate_string_value(
 
 
 def _fallback_string_value(prompt: str, param_name: str) -> str:
+    """Extract a string value from the prompt using deterministic regex patterns."""
     quoted = re.findall(r"'([^']*)'|\"([^\"]*)\"", prompt)
     quoted_values: list[str] = [a or b for a, b in quoted]
     lowered = prompt.lower()
@@ -256,6 +264,7 @@ def _generate_param_value(
     param_index: int = 0,
     already_used: list[Any] | None = None,
 ) -> Any:
+    """Dispatch generation by type; apply fallback if the LLM output is unreliable."""
     used = already_used or []
     if param_type == "number":
         generated = _generate_number_value(model, prompt, param_name)
@@ -284,6 +293,7 @@ def generate_function_call(
     prompt: str,
     ctx: GenerationContext,
 ) -> FunctionCall:
+    """Build a validated FunctionCall from a natural-language prompt."""
     selected_name = _select_function_name(model, prompt, ctx.functions)
     by_name = {f.name: f for f in ctx.functions}
     if selected_name not in by_name:

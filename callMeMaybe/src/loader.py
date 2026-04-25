@@ -5,7 +5,7 @@ import os
 
 
 def load_functions_def(path: str) -> list[FunctionDef]:
-    """Load and validate function definitions from JSON."""
+    """Parse and validate function definitions from a JSON file."""
     try:
         with open(path, "r", encoding="utf-8") as f:
             res = json.load(f)
@@ -24,7 +24,7 @@ def load_functions_def(path: str) -> list[FunctionDef]:
 
 
 def load_tests_prompt(path: str) -> list[TestPrompt]:
-    """Load and validate test prompts from JSON."""
+    """Parse and validate natural-language test prompts from a JSON file."""
     try:
         with open(path, "r", encoding="utf-8") as f:
             res = json.load(f)
@@ -43,7 +43,7 @@ def load_tests_prompt(path: str) -> list[TestPrompt]:
 
 
 def save_results_in_json(results: list[FunctionCall], path: str) -> None:
-    """Save function call results as JSON."""
+    """Serialize a list of FunctionCall objects to an indented JSON file."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     with open(path, "w", encoding="utf-8") as f:

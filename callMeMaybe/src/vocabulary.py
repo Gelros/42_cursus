@@ -4,7 +4,7 @@ import json
 
 
 def load_vocab(model: Small_LLM_Model) -> dict[str, int]:
-    """Load tokenizer vocabulary from model files."""
+    """Return the token-to-id mapping from the model's tokenizer file."""
     path = model.get_path_to_tokenizer_file()
     try:
         with open(path, "r") as f:
@@ -23,7 +23,7 @@ def load_vocab(model: Small_LLM_Model) -> dict[str, int]:
 def pre_calc_name_func(
     functions: list[FunctionDef], model: Small_LLM_Model
 ) -> dict[str, list[int]]:
-    """Pre-calculate the token IDs for each function name."""
+    """Pre-tokenize all function names once at startup to avoid redundant calls."""
     result: dict[str, list[int]] = {}
     for func in functions:
         result[func.name] = model.encode(func.name)[0].tolist()

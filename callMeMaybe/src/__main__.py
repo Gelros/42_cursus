@@ -7,6 +7,7 @@ from src.generator import GenerationContext, generate_function_call
 
 
 def main() -> None:
+    """Load inputs, run the generation pipeline, and write results to JSON."""
     parser = argparse.ArgumentParser(
         description="Generate function calls from prompts."
     )
