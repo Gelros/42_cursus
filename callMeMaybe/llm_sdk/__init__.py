@@ -8,7 +8,7 @@ from transformers import (
 from huggingface_hub import hf_hub_download
 
 
-logging.set_verbosity_error()  # keep the console clean
+logging.set_verbosity_error()  # type: ignore[no-untyped-call]  # keep the console clean
 
 
 class Small_LLM_Model:
@@ -53,7 +53,7 @@ class Small_LLM_Model:
             trust_remote_code=trust_remote_code,
         )
         cast(Any, self._model).to(self._device)
-        self._model.eval()
+        self._model.eval()  # type: ignore[no-untyped-call]
 
         # switch to inference-only mode
         for p in self._model.parameters():

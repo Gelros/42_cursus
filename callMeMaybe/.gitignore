@@ -1,8 +1,52 @@
-.venv/
-.mypy_cache/
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Type-checking / linting ────────────────────────────────────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# ── Testing / coverage ─────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# ── Project-specific ───────────────────────────────────────────────────────────
+data/output/          # generated at runtime — do not commit (subject requirement)
+en.subject.pdf        # subject PDF provided by 42
+
+# ── Editors / IDEs ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursorrules
+.cursor/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ── Claude Code worktrees / session data ─────────────────────────────────────
 .claude/
-cours/
-SOUTENANCE.md/
-en.subject.pdf/
-.cursorrules/
