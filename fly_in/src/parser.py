@@ -1,36 +1,44 @@
-from typing import Any
-from src.models import ParsedMap, Hub, Connexions, HubType, ZoneType
-from pydantic import ValidationError
+"""Map file parser: turns a .txt map file into a validated ParsedMap."""
+
 import re
+from typing import Any
+
+from pydantic import ValidationError
+
+from src.models import Connexions, Hub, HubType, ParsedMap
 
 
 class ParseError(Exception):
-    """Erreur de parsing avec numéro de ligne."""
+    """Raised when a map file cannot be parsed (with line context)."""
 
 
 _DRONES_REGEX = r"^nb_drones:\s*(\d+)$"
-_HUB_REGEX = r"^(start_hub|end_hub|hub):\s+(\S+)\s+(-?\d+)\s+(-?\d+)(?:\s+\[(.*)\])?$"
+_HUB_REGEX = (
+    r"^(start_hub|end_hub|hub):\s+(\S+)\s+(-?\d+)\s+(-?\d+)"
+    r"(?:\s+\[(.*)\])?$"
+)
 _CONNEXIONS_REGEX = r"^connection:\s+(\S+)-(\S+)(?:\s+\[(.*)\])?$"
 _META_REGEX = r"(\w+)\s*=\s*(\S+)"
 
 
 def _parse_nb_drones(line: str, line_no: int) -> int:
+    """Parse a `nb_drones: N` line into a positive integer."""
     match = re.match(_DRONES_REGEX, line)
-
     if not match:
-        raise ValueError(f"Ligne invalide (nb_drones) n°: {line_no}")
+        raise ValueError(f"Invalid nb_drones line at {line_no}")
     nb = int(match.groups()[0])
     if nb < 1:
-        raise ValueError(f"nb_drones doit être >= 1, ligne {line_no}")
+        raise ValueError(f"nb_drones must be >= 1, line {line_no}")
     return nb
 
 
 def _parse_hub(line: str, line_no: int) -> Hub:
+    """Parse a hub declaration line into a validated Hub instance."""
     match = re.match(_HUB_REGEX, line)
     if not match:
-        raise ValueError(f"Ligne invalide n°: {line_no} ligne = {line}")
+        raise ValueError(f"Invalid hub line at {line_no}: {line!r}")
     h_type_str, h_name, h_x, h_y, h_tags = match.groups()
-    meta_data = _parse_metadata(h_tags, line_no)
+    meta = _parse_metadata(h_tags, line_no)
 
     try:
         return Hub(
@@ -38,94 +46,105 @@ def _parse_hub(line: str, line_no: int) -> Hub:
             name=h_name,
             x=int(h_x),
             y=int(h_y),
-            zone_type=meta_data.get("zone", "normal"),
-            color=meta_data.get("color"),
-            max_drones=meta_data.get("max_drones", 1)
+            zone_type=meta.get("zone", "normal"),
+            color=meta.get("color"),
+            max_drones=meta.get("max_drones", 1),
         )
     except ValidationError as e:
-        raise ValueError(f"Hub invalide ligne {line_no}: {e}") from e
+        raise ValueError(f"Invalid hub at line {line_no}: {e}") from e
 
 
 def _parse_connexion(line: str, line_no: int) -> Connexions:
+    """Parse a `connection: a-b [meta]` line into a Connexions instance."""
     match = re.match(_CONNEXIONS_REGEX, line)
     if not match:
-        raise ValueError(f"Ligne invalide (connexions) n°: {line_no}")
+        raise ValueError(f"Invalid connection line at {line_no}")
     meta = _parse_metadata(match.group(3), line_no) if match.group(3) else {}
 
     try:
         return Connexions(
             param_1=match.groups()[0],
             param_2=match.groups()[1],
-            max_link_capacity=meta.get("max_link_capacity", 1)
+            max_link_capacity=meta.get("max_link_capacity", 1),
         )
     except ValidationError as e:
-        raise ValueError(f"Connexion invalide ligne {line_no}: {e}") from e
+        raise ValueError(f"Invalid connection at line {line_no}: {e}") from e
 
 
-def _parse_metadata(block: str, line_no: int) -> dict[str, Any]:
+def _parse_metadata(block: str | None, line_no: int) -> dict[str, Any]:
+    """Parse a `[key=value key=value]` block into a typed dict."""
     if block is None:
         return {}
 
-    match = re.findall(_META_REGEX, block)
-    if not match:
-        raise ValueError(f"Metadata vide ou invalide, ligne {line_no}")
+    matches = re.findall(_META_REGEX, block)
+    if not matches:
+        raise ValueError(f"Empty or invalid metadata at line {line_no}")
 
     allowed_keys = {"zone", "color", "max_drones", "max_link_capacity"}
     allowed_zones = {"normal", "blocked", "restricted", "priority"}
     int_keys = {"max_drones", "max_link_capacity"}
-    result = {}
+    result: dict[str, Any] = {}
 
-    for k, v in match:
-        if not k in allowed_keys:
-            raise ValueError(f"Clé metadata inconnue '{k}' ligne {line_no}")
-
-        elif k in int_keys:
-            if not re.fullmatch(r"-?\d+", v):
-                raise ValueError(f"{k} doit être un entier, ligne {line_no}")
-            ivalue = int(v)
+    for key, value in matches:
+        if key not in allowed_keys:
+            raise ValueError(
+                f"Unknown metadata key '{key}' at line {line_no}"
+            )
+        if key in int_keys:
+            if not re.fullmatch(r"-?\d+", value):
+                raise ValueError(
+                    f"{key} must be an integer at line {line_no}"
+                )
+            ivalue = int(value)
             if ivalue < 1:
-                raise ValueError(f"{k} doit être >= 1, ligne {line_no}")
-            result[k] = ivalue
-
-        elif k == "zone":
-            if not v in allowed_zones:
-                raise ValueError(f"Type de zone invalide '{v}', ligne {line_no}")
-            result[k] = v
+                raise ValueError(
+                    f"{key} must be >= 1 at line {line_no}"
+                )
+            result[key] = ivalue
+        elif key == "zone":
+            if value not in allowed_zones:
+                raise ValueError(
+                    f"Invalid zone type '{value}' at line {line_no}"
+                )
+            result[key] = value
         else:
-            result[k] = v
-        
+            result[key] = value
 
     return result
 
 
 def parse_map(path: str) -> ParsedMap:
-    try:
-        nb_drones: int | None = None
-        hub = []
-        connexions = []
+    """Parse a map file at *path* into a validated ParsedMap."""
+    nb_drones: int | None = None
+    hubs: list[Hub] = []
+    connexions: list[Connexions] = []
 
-        with open(path, "r") as f:
-            line_no = 0
-            for count_line, line in enumerate(f, start=1):
-                line = line.strip()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            for count_line, raw_line in enumerate(f, start=1):
+                line = raw_line.strip()
                 if not line or line.startswith("#"):
                     continue
 
                 if line.startswith("nb_drones:"):
                     nb_drones = _parse_nb_drones(line, count_line)
                 elif line.startswith(("hub:", "start_hub:", "end_hub:")):
-                    hub.append(_parse_hub(line, count_line))
+                    hubs.append(_parse_hub(line, count_line))
                 elif line.startswith("connection:"):
                     connexions.append(_parse_connexion(line, count_line))
                 else:
-                    raise ParseError(f"Ligne {count_line} : Contenu inconnu -> '{line.strip()}'")
-            if not nb_drones:
-                raise ParseError(f"Pas assez de drones, ligne: {line_no}")
-
+                    raise ParseError(
+                        f"Line {count_line}: unknown content -> '{line}'"
+                    )
     except FileNotFoundError as e:
-        raise ParseError(f"Fichier introuvable : {path}") from e
+        raise ParseError(f"File not found: {path}") from e
+
+    if nb_drones is None:
+        raise ParseError("Missing 'nb_drones:' declaration in map")
 
     try:
-        return ParsedMap(nb_drones=nb_drones, hub=hub, connexions=connexions)
+        return ParsedMap(
+            nb_drones=nb_drones, hub=hubs, connexions=connexions
+        )
     except ValidationError as e:
-        raise ParseError(f"Map invalide : {e}") from e
+        raise ParseError(f"Invalid map: {e}") from e

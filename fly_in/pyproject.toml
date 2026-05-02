@@ -46,6 +46,9 @@ show_error_codes = true
 pretty = true
 exclude = [
     "\\.venv",
+    "\\.claude",
+    "\\.pytest_cache",
+    "\\.mypy_cache",
     "build",
     "dist",
 ]
