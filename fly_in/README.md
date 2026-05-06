@@ -93,12 +93,12 @@ Reference targets come from the subject (Section VII.7).
 | `maps/easy/02_simple_fork.txt` | 3 | 6 | 6 |
 | `maps/easy/03_basic_capacity.txt` | 4 | 8 | 7 |
 | `maps/medium/01_dead_end_trap.txt` | 5 | 15 | 9 |
-| `maps/medium/02_circular_loop.txt` | 6 | 20 | 10 |
+| `maps/medium/02_circular_loop.txt` | 6 | 20 | 12 |
 | `maps/medium/03_priority_puzzle.txt` | 4 | 12 | 8 |
 | `maps/hard/01_maze_nightmare.txt` | 8 | 45 | 15 |
 | `maps/hard/02_capacity_hell.txt` | 12 | 60 | 19 |
 | `maps/hard/03_ultimate_challenge.txt` | 15 | 35 | 27 |
-| `maps/challenger/01_the_impossible_dream.txt` | 25 | 45 (record) | 40 |
+| `maps/challenger/01_the_impossible_dream.txt` | 25 | 45 (record) | 44 |
 
 Run any of them with:
 
@@ -208,12 +208,14 @@ without first understanding the underlying mathematics.
 
 ## Known limitations
 
-- Multi-turn occupancy of restricted-zone connexions (the subject mandates
-  that a drone moving toward a restricted zone occupies the connexion for
-  one turn before reaching the destination) is approximated by an extra
-  cost in Dijkstra rather than simulated explicitly. The output therefore
-  shows the drone at the destination immediately, with the cost reflected
-  in the makespan.
+- The connection naming for in-transit drones (subject format
+  `D<id>-<connection>`) uses a synthetic identifier `<src>~<dst>` because
+  the map format does not name connections explicitly. For instance, a
+  drone in transit toward `overflow_hell1` (restricted) coming from
+  `micro_gate1` is reported as `D0-micro_gate1~overflow_hell1` for one
+  turn, then `D0-overflow_hell1` once the drone has actually reached the
+  destination hub. This keeps capacity rules unambiguous: only the
+  arrival turn counts against the destination's `max_drones`.
 - The scheduler is a greedy heuristic; for some pathological topologies a
   more sophisticated joint optimisation (e.g. flow-based scheduling) could
   yield strictly fewer turns.

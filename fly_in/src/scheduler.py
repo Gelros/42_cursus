@@ -68,7 +68,7 @@ class Scheduler:
                     best_start = start
                     best_end = end
 
-            assert best_path is not None  # path_capacity is non-empty
+            assert best_path is not None
             assignments.append(
                 DroneAssignment(
                     drone_id=drone_id,

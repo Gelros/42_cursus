@@ -10,8 +10,8 @@ class TurnState:
     """Snapshot of the simulation at a given turn."""
 
     turn: int
-    positions: dict[int, str]   # drone_id -> hub_name
-    arrived: set[int]           # drones that have already finished
+    positions: dict[int, str]
+    arrived: set[int]
 
 
 class Simulator:

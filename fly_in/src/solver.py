@@ -41,7 +41,8 @@ class Solver:
         """Run the pipeline end-to-end and return a SolveResult."""
         parsed = parse_map(self.path)
         graph = Graph(parsed)
-        paths = self.pathfinder_cls(graph).find()
+        raw_paths = self.pathfinder_cls(graph).find()
+        paths = [self._expand_for_costs(p, graph) for p in raw_paths]
         assignments = Scheduler(
             paths=paths, nb_drones=parsed.nb_drones
         ).assign()
@@ -54,3 +55,25 @@ class Solver:
             states=simulator.run(),
             makespan=simulator.makespan,
         )
+
+    @staticmethod
+    def _expand_for_costs(path: Path, graph: Graph) -> Path:
+        """Inject in-transit markers for hubs whose cost is > 1.
+
+        For a hub whose traversal cost is N, the drone first occupies the
+        connection toward it for ``N - 1`` turns, then arrives at the hub
+        on the last turn. The transit turns are encoded as the synthetic
+        name ``<src>~<dst>``, so the simulator never reports an in-transit
+        drone as occupying the destination hub. This both keeps
+        ``len(path) - 1`` aligned with the real number of turns and
+        prevents false ``max_drones`` overflows on restricted hubs.
+        """
+        expanded: Path = [path[0]]
+        for i in range(1, len(path)):
+            cur = path[i]
+            prev = path[i - 1]
+            cost = int(graph.node(cur).cost)
+            for _ in range(cost - 1):
+                expanded.append(f"{prev}~{cur}")
+            expanded.append(cur)
+        return expanded

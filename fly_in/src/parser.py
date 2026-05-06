@@ -118,6 +118,8 @@ def parse_map(path: str) -> ParsedMap:
     nb_drones: int | None = None
     hubs: list[Hub] = []
     connexions: list[Connexions] = []
+    seen_hub_names: set[str] = set()
+    seen_connections: set[frozenset[str]] = set()
 
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -129,15 +131,42 @@ def parse_map(path: str) -> ParsedMap:
                 if line.startswith("nb_drones:"):
                     nb_drones = _parse_nb_drones(line, count_line)
                 elif line.startswith(("hub:", "start_hub:", "end_hub:")):
-                    hubs.append(_parse_hub(line, count_line))
+                    hub = _parse_hub(line, count_line)
+                    if hub.name in seen_hub_names:
+                        raise ParseError(
+                            f"Line {count_line}: duplicate hub "
+                            f"name '{hub.name}'"
+                        )
+                    seen_hub_names.add(hub.name)
+                    hubs.append(hub)
                 elif line.startswith("connection:"):
-                    connexions.append(_parse_connexion(line, count_line))
+                    cnx = _parse_connexion(line, count_line)
+                    key = frozenset({cnx.param_1, cnx.param_2})
+                    if key in seen_connections:
+                        raise ParseError(
+                            f"Line {count_line}: duplicate connection "
+                            f"'{cnx.param_1}-{cnx.param_2}'"
+                        )
+                    if cnx.param_1 not in seen_hub_names:
+                        raise ParseError(
+                            f"Line {count_line}: connection refers to "
+                            f"undefined hub '{cnx.param_1}'"
+                        )
+                    if cnx.param_2 not in seen_hub_names:
+                        raise ParseError(
+                            f"Line {count_line}: connection refers to "
+                            f"undefined hub '{cnx.param_2}'"
+                        )
+                    seen_connections.add(key)
+                    connexions.append(cnx)
                 else:
                     raise ParseError(
                         f"Line {count_line}: unknown content -> '{line}'"
                     )
     except FileNotFoundError as e:
         raise ParseError(f"File not found: {path}") from e
+    except ValueError as e:
+        raise ParseError(str(e)) from e
 
     if nb_drones is None:
         raise ParseError("Missing 'nb_drones:' declaration in map")
