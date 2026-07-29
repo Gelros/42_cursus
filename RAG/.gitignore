@@ -1,0 +1,20 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# --- Type / lint caches ---
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# --- Project: never commit data, weights or generated outputs (IX) ---
+data/raw/
+data/datasets/
+data/processed/
+data/output/
+
+# --- Misc ---
+.DS_Store

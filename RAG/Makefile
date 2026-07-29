@@ -1,0 +1,53 @@
+# Makefile — RAG against the machine
+# Targets required by the subject (III.2): install, run, debug, clean, lint.
+# lint-strict is the optional stricter variant.
+
+.PHONY: install run debug clean lint lint-strict help
+
+# Default query / paths used by `make run` and `make debug`.
+QUERY ?= How to configure the OpenAI server?
+K     ?= 10
+
+help:
+	@echo "Available targets:"
+	@echo "  install      Install project dependencies with uv."
+	@echo "  run          Run a sample search (override with QUERY=... K=...)."
+	@echo "  debug        Run the CLI under pdb."
+	@echo "  lint         flake8 + mypy with the subject's flags."
+	@echo "  lint-strict  flake8 + mypy --strict."
+	@echo "  clean        Remove caches and Python artifacts."
+
+# III.2 install: install dependencies (we use uv as required by IV.2).
+install:
+	uv sync
+	@# macOS-only: uv marks the venv "hidden", which makes Python skip the
+	@# editable .pth file (so `python -m student` fails). Clearing it is a no-op
+	@# elsewhere.
+	-@chflags -R nohidden .venv 2>/dev/null || true
+
+# III.2 run: execute the main script. Defaults to a search; override QUERY/K.
+run:
+	uv run python -m student index --max_chunk_size 1000
+
+# III.2 debug: run the main script under Python's built-in debugger.
+debug:
+	uv run python -m pdb -m student search "$(QUERY)" --k=$(K)
+
+# III.2 lint: exact flags mandated by the subject.
+lint:
+	uv run flake8 .
+	uv run mypy . --warn-return-any --warn-unused-ignores \
+		--ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+
+# III.2 lint-strict (optional): the stricter variant.
+lint-strict:
+	uv run flake8 .
+	uv run mypy . --strict
+
+# III.2 clean: remove temporary files and caches.
+clean:
+	find . -type d -name '__pycache__' -prune -exec rm -rf {} +
+	find . -type d -name '.mypy_cache' -prune -exec rm -rf {} +
+	find . -type d -name '.pytest_cache' -prune -exec rm -rf {} +
+	find . -type d -name '.ruff_cache' -prune -exec rm -rf {} +
+	find . -type f -name '*.py[co]' -delete

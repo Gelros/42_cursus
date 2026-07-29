@@ -1,0 +1,68 @@
+[project]
+name = "rag-against-the-machine"
+version = "0.1.0"
+description = "Retrieval-Augmented Generation system for the vLLM codebase (42 project)."
+requires-python = "==3.10.*"
+readme = "README.md"
+authors = [
+    { name = "guillaume" },
+]
+
+dependencies = [
+    # --- Core obligations from the subject ---
+    "pydantic>=2.7,<3",          # IV.1 : all classes MUST use pydantic
+    "fire>=0.6.0",               # IV.2 : CLI must be built with Python Fire
+    "tqdm>=4.66",                # IV.2 : progress bars for long-running ops
+
+    # --- Retrieval / chunking (one of TF-IDF or BM25 is mandatory, V.5) ---
+    "bm25s>=0.2.0",              # fast pure-Python BM25 implementation
+    "scikit-learn>=1.4",         # provides TfidfVectorizer if we want TF-IDF too
+
+    # --- LLM (Qwen/Qwen3-0.6B mandatory, IV.2) ---
+    "transformers>=4.44",
+    "torch>=2.3",
+    "accelerate>=0.33",          # required by transformers for device_map etc.
+
+    # --- Misc utilities ---
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+# Bonus features (chap. VIII) — kept optional so the base install stays light.
+bonus = [
+    "sentence-transformers>=3.0",  # semantic embeddings
+    "chromadb>=0.5",                # vector DB
+    "langchain>=0.2",               # optional orchestration helpers
+]
+
+[dependency-groups]
+# uv-native dev group (installed by `uv sync`, not by `uv sync --no-dev`)
+dev = [
+    "flake8>=7.0",                 # III.1 : flake8 standard
+    "mypy>=1.10",                  # III.1 : type checking must pass
+    "types-tqdm",                  # type stubs for mypy
+]
+
+[project.scripts]
+# Allows `uv run student ...` once installed.
+student = "student.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/student"]
+
+# ----------------------------------------------------------------------
+# Tooling configuration
+# ----------------------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+exclude = '(^|/)(\.venv|\.claude|\.git|data|build)/'
