@@ -18,6 +18,5 @@ data/output/
 
 # --- Misc ---
 .DS_Store
-
 .claude/
-fiche_defense/
+fiche_defense.pdf
