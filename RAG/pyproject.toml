@@ -43,16 +43,12 @@ dev = [
     "types-tqdm",                  # type stubs for mypy
 ]
 
-[project.scripts]
-# Allows `uv run student ...` once installed.
-student = "student.__main__:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/student"]
+packages = ["src"]
 
 # ----------------------------------------------------------------------
 # Tooling configuration

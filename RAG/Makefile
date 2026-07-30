@@ -20,18 +20,14 @@ help:
 # III.2 install: install dependencies (we use uv as required by IV.2).
 install:
 	uv sync
-	@# macOS-only: uv marks the venv "hidden", which makes Python skip the
-	@# editable .pth file (so `python -m student` fails). Clearing it is a no-op
-	@# elsewhere.
-	-@chflags -R nohidden .venv 2>/dev/null || true
 
 # III.2 run: execute the main script. Defaults to a search; override QUERY/K.
 run:
-	uv run python -m student index --max_chunk_size 1000
+	uv run python -m src search "$(QUERY)" --k=$(K)
 
 # III.2 debug: run the main script under Python's built-in debugger.
 debug:
-	uv run python -m pdb -m student search "$(QUERY)" --k=$(K)
+	uv run python -m pdb -m src search "$(QUERY)" --k=$(K)
 
 # III.2 lint: exact flags mandated by the subject.
 lint:

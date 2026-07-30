@@ -1,4 +1,4 @@
-"""Student CLI — `uv run python -m student <command>`.
+"""RAG CLI — `uv run python -m src <command>`.
 
 Six sub-commands required by the subject (V.2.5):
     index            : build and persist the BM25 index from data/raw/vllm-0.10.1
@@ -44,9 +44,6 @@ INDEX_DIR = Path("data/processed/bm25_index")
 class Student:
     """RAG system over the vLLM codebase."""
 
-    # ------------------------------------------------------------------
-    # 1. index — build the BM25 index from the repo
-    # ------------------------------------------------------------------
     def index(
         self,
         max_chunk_size: int = 2000,
@@ -245,8 +242,17 @@ class Student:
 
 
 def main() -> None:
-    """Entry point: Fire exposes every Student method as a sub-command."""
-    fire.Fire(Student)
+    """Entry point: Fire exposes every Student method as a sub-command.
+
+    Wrapped so degenerate inputs (missing files, unreadable index, ...) print
+    a clear message instead of crashing with a traceback (subject V.2.5).
+    """
+    try:
+        fire.Fire(Student)
+    except FileNotFoundError as exc:
+        print(f"Error: file not found: {exc.filename}")
+    except (ValueError, KeyError, OSError) as exc:
+        print(f"Error: {exc}")
 
 
 if __name__ == "__main__":

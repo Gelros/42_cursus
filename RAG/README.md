@@ -39,11 +39,6 @@ make install          # == uv sync
 This creates a virtual environment and installs every dependency
 (`pydantic`, `fire`, `tqdm`, `bm25s`, `transformers`, `torch`, ...).
 
-> **macOS note.** If `python -m student` ever reports `No module named
-> student`, uv has re-marked the venv as hidden (Python then skips the
-> editable install). Fix it with `chflags -R nohidden .venv` or simply
-> re-run `make install`.
-
 ### Data layout
 
 The system expects the vLLM repository and the question datasets here
@@ -66,28 +61,28 @@ data/
 
 ```bash
 # 1. Build the index (recommended chunk size: 1000, see Performance analysis)
-uv run python -m student index --max_chunk_size 1000
+uv run python -m src index --max_chunk_size 1000
 
 # 2. Ad-hoc search
-uv run python -m student search "How to configure the OpenAI server?" --k 10
+uv run python -m src search "How to configure the OpenAI server?" --k 10
 
 # 3. Batch search over a dataset of questions
-uv run python -m student search_dataset \
+uv run python -m src search_dataset \
     --dataset_path data/datasets/UnansweredQuestions/dataset_docs_public.json \
     --k 10 \
     --save_directory data/output/search_results
 
 # 4. Evaluate retrieval against the ground truth
-uv run python -m student evaluate \
+uv run python -m src evaluate \
     --student_answer_path data/output/search_results/dataset_docs_public.json \
     --dataset_path data/datasets/AnsweredQuestions/dataset_docs_public.json \
     --k 10
 
 # 5. Answer a single question (loads Qwen3-0.6B, ~1.2 GB on first run)
-uv run python -m student answer "How do I configure the OpenAI server?" --k 10
+uv run python -m src answer "How do I configure the OpenAI server?" --k 10
 
 # 6. Generate answers for every question of a search-results file
-uv run python -m student answer_dataset \
+uv run python -m src answer_dataset \
     --student_search_results_path data/output/search_results/dataset_docs_public.json \
     --save_directory data/output/search_results_and_answer
 ```
@@ -107,10 +102,10 @@ uv run python -m student answer_dataset \
 
 ## System architecture
 
-The pipeline is split into single-responsibility modules under `src/student/`:
+The pipeline is split into single-responsibility modules under `src/`:
 
 ```
-src/student/
+src/
 ├── __main__.py    CLI (Python Fire): the 6 sub-commands. Pure orchestration.
 ├── models.py      Pydantic models (subject V.7) + the internal Chunk model.
 ├── chunking.py    walk_files + 3 chunkers + chunk_file dispatcher.
@@ -133,8 +128,8 @@ Data flow:
                                                    --QwenGenerator.answer--> answer
 ```
 
-The module **must** be named `student`: the subject invokes it as
-`python -m student ...` (V.6.2, V.6.3).
+The CLI is invoked as `python -m src <command>` (the evaluation grid's
+convention). `src/__main__.py` is the package entry point.
 
 ---
 
@@ -241,16 +236,16 @@ code (0.62) at the cost of docs (0.79).
 ## Example usage
 
 ```bash
-$ uv run python -m student search "How to configure the OpenAI server?" --k 3
+$ uv run python -m src search "How to configure the OpenAI server?" --k 3
 {"file_path": "data/raw/vllm-0.10.1/docs/deployment/frameworks/dstack.md", ...}
 {"file_path": "data/raw/vllm-0.10.1/docs/deployment/integrations/kubeai.md", ...}
 {"file_path": "data/raw/vllm-0.10.1/docs/features/structured_outputs.md", ...}
 
-$ uv run python -m student answer "How do I configure the OpenAI server?" --k 3
+$ uv run python -m src answer "How do I configure the OpenAI server?" --k 3
 The OpenAI compatible server can be configured by appending the following to
 your model arguments: `--quantization bitsandbytes`.
 
-$ uv run python -m student evaluate \
+$ uv run python -m src evaluate \
     --student_answer_path data/output/search_results/dataset_docs_public.json \
     --dataset_path data/datasets/AnsweredQuestions/dataset_docs_public.json --k 10
 {'Recall@1': 0.60, 'Recall@3': 0.72, 'Recall@5': 0.80, 'Recall@10': 0.85}
