@@ -10,12 +10,6 @@ venv/
 .pytest_cache/
 .ruff_cache/
 
-# --- Project: never commit data, weights or generated outputs (IX) ---
-data/raw/
-data/datasets/
-data/processed/
-data/output/
-
 # --- Misc ---
 .DS_Store
 .claude/

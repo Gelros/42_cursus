@@ -9,26 +9,21 @@ authors = [
 ]
 
 dependencies = [
-    # --- Core obligations from the subject ---
     "pydantic>=2.7,<3",          # IV.1 : all classes MUST use pydantic
     "fire>=0.6.0",               # IV.2 : CLI must be built with Python Fire
     "tqdm>=4.66",                # IV.2 : progress bars for long-running ops
 
-    # --- Retrieval / chunking (one of TF-IDF or BM25 is mandatory, V.5) ---
     "bm25s>=0.2.0",              # fast pure-Python BM25 implementation
     "scikit-learn>=1.4",         # provides TfidfVectorizer if we want TF-IDF too
 
-    # --- LLM (Qwen/Qwen3-0.6B mandatory, IV.2) ---
     "transformers>=4.44",
     "torch>=2.3",
     "accelerate>=0.33",          # required by transformers for device_map etc.
 
-    # --- Misc utilities ---
     "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
-# Bonus features (chap. VIII) — kept optional so the base install stays light.
 bonus = [
     "sentence-transformers>=3.0",  # semantic embeddings
     "chromadb>=0.5",                # vector DB
@@ -36,7 +31,6 @@ bonus = [
 ]
 
 [dependency-groups]
-# uv-native dev group (installed by `uv sync`, not by `uv sync --no-dev`)
 dev = [
     "flake8>=7.0",                 # III.1 : flake8 standard
     "mypy>=1.10",                  # III.1 : type checking must pass
