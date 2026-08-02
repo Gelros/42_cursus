@@ -18,8 +18,16 @@ help:
 	@echo "  clean        Remove caches and Python artifacts."
 
 # III.2 install: install dependencies (we use uv as required by IV.2).
+# On 42 machines, redirect uv's wheel cache (~2 GB) to goinfre so it does not
+# fill the home quota. Falls back to the default cache when ~/goinfre is absent.
 install:
-	uv sync
+	@if [ -d "$$HOME/goinfre" ]; then \
+		mkdir -p "$$HOME/goinfre/uv-cache"; \
+		echo "goinfre detected -> uv cache in $$HOME/goinfre/uv-cache"; \
+		UV_CACHE_DIR="$$HOME/goinfre/uv-cache" uv sync; \
+	else \
+		uv sync; \
+	fi
 
 # III.2 run: execute the main script. Defaults to a search; override QUERY/K.
 run:
