@@ -71,9 +71,6 @@ class Student:
 
         return f"Indexed {len(chunks)} chunks from {len(files)} files -> {out}"
 
-    # ------------------------------------------------------------------
-    # 2. search — single query
-    # ------------------------------------------------------------------
     def search(
         self,
         query: str,
@@ -95,9 +92,6 @@ class Student:
 
         return [s.model_dump() for s in sources]
 
-    # ------------------------------------------------------------------
-    # 3. search_dataset — batch over a JSON of questions
-    # ------------------------------------------------------------------
     def search_dataset(
         self,
         dataset_path: str,
@@ -136,9 +130,6 @@ class Student:
 
         return f"Saved student_search_results to {out_path}"
 
-    # ------------------------------------------------------------------
-    # 4. answer — single question + generation
-    # ------------------------------------------------------------------
     def answer(
         self,
         question: str,
@@ -154,9 +145,6 @@ class Student:
 
         return gen.answer(question, context, max_new_tokens=max_new_tokens)
 
-    # ------------------------------------------------------------------
-    # 5. answer_dataset — generate for every search result
-    # ------------------------------------------------------------------
     def answer_dataset(
         self,
         student_search_results_path: str,
@@ -206,9 +194,6 @@ class Student:
 
         return f"Saved student_search_results_and_answer to {out_path}"
 
-    # ------------------------------------------------------------------
-    # 6. evaluate — recall@k of student results vs ground truth
-    # ------------------------------------------------------------------
     def evaluate(
         self,
         student_answer_path: str,

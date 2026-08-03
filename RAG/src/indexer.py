@@ -14,10 +14,6 @@ from .models import Chunk
 from .tokenizer import QUERY_STOPWORDS, tokenize
 
 
-# ----------------------------------------------------------------------
-# Build
-# ----------------------------------------------------------------------
-
 def build_index(chunks: list[Chunk]) -> bm25s.BM25:
     """Tokenize every chunk and build the BM25 index."""
     if not chunks:
@@ -27,10 +23,6 @@ def build_index(chunks: list[Chunk]) -> bm25s.BM25:
     retriever.index(corpus_tokens, show_progress=False)
     return retriever
 
-
-# ----------------------------------------------------------------------
-# Save / load
-# ----------------------------------------------------------------------
 
 CHUNKS_FILENAME = "chunks.json"
 
@@ -62,10 +54,6 @@ def load_index(index_dir: Path) -> tuple[bm25s.BM25, list[Chunk]]:
         chunks = [Chunk(**d) for d in json.load(f)]
     return retriever, chunks
 
-
-# ----------------------------------------------------------------------
-# Search
-# ----------------------------------------------------------------------
 
 def search(
     retriever: bm25s.BM25,

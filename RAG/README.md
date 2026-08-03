@@ -60,8 +60,8 @@ data/
 ### Full pipeline (copy/paste)
 
 ```bash
-# 1. Build the index (recommended chunk size: 1000, see Performance analysis)
-uv run python -m src index --max_chunk_size 1000
+# 1. Build the index (default/recommended chunk size: 2000)
+uv run python -m src index --max_chunk_size 2000
 
 # 2. Ad-hoc search
 uv run python -m src search "How to configure the OpenAI server?" --k 10
@@ -137,15 +137,18 @@ convention). `src/__main__.py` is the package entry point.
 
 The subject requires different strategies per file type (V.4). `chunk_file`
 dispatches on the extension and enforces a configurable maximum chunk size
-(default 2000, recommended 1000):
+(default 2000):
 
 - **Python (`.py`) — AST-based.** The file is parsed with the standard
   `ast` module; each top-level function / async function / class becomes one
   chunk. This keeps semantic units intact (a whole function rather than an
   arbitrary cut). On a `SyntaxError`, it falls back to fixed-window chunking.
-- **Markdown (`.md`) — heading-based.** The text is split on ATX headings
-  (`#` … `######`) using a regex; each section (heading + body) becomes a
-  chunk. Content before the first heading forms its own chunk.
+- **Markdown (`.md`) — heading-based with merging.** The text is split on ATX
+  headings (`#` … `######`), then consecutive sections are greedily merged up
+  to `max_chunk_size`. Splitting on every heading alone yields many tiny
+  chunks that align poorly with the reference source ranges (~1 kB on
+  average); merging produces chunks close to that size and improved docs
+  recall@5 from 0.77 to 0.80.
 - **Fixed-window fallback.** A sliding window of `max_chunk_size` characters
   with a small overlap, used for any other file and to sub-chunk any
   oversized AST/Markdown chunk so the hard cap is always respected.
@@ -181,26 +184,27 @@ can emit the `MinimalSource` objects the subject requires.
 
 ## Performance analysis
 
-Measured on the public datasets (100 questions each), `max_chunk_size=1000`,
-on Apple Silicon:
+Measured with the moulinette's IoU@0.05 metric, `max_chunk_size=2000`, on
+Apple Silicon:
 
-| Dataset | Recall@1 | Recall@5 | Recall@10 | Subject threshold (R@5) |
-|---------|----------|----------|-----------|-------------------------|
-| docs    | 0.60     | **0.80** | 0.85      | 0.80 ✅                 |
-| code    | 0.36     | **0.54** | 0.68      | 0.50 ✅                 |
+| Dataset | Recall@5 | Recall@10 | Threshold (R@5) |
+|---------|----------|-----------|-----------------|
+| docs    | **0.80** | 0.85      | 0.80 ✅         |
+| code    | **0.54** | 0.67      | 0.50 ✅         |
 
 Timings (largely below the subject's limits):
 
-| Metric                         | Measured        | Subject limit |
-|--------------------------------|-----------------|---------------|
-| Indexing (1926 files, 26k chunks) | ~5 s         | ≤ 5 min       |
-| Cold start (model load)        | ~10–15 s        | ≤ 60 s        |
-| Search throughput (100 queries)| < 1 s           | ≤ 90 s/1000   |
+| Metric                          | Measured  | Subject limit |
+|---------------------------------|-----------|---------------|
+| Indexing (1926 files, 15k chunks) | ~5 s    | ≤ 5 min       |
+| Cold start (model load)         | ~10–15 s  | ≤ 60 s        |
+| Search throughput (200 queries) | < 2 s     | ≤ 90 s        |
 
-**Chunk-size trade-off.** Smaller chunks improve documentation recall (more
-precise BM25 hits) but slightly hurt code recall (functions get fragmented).
-`1000` is the sweet spot that clears both mandatory thresholds; `2000` favours
-code (0.62) at the cost of docs (0.79).
+**How recall is scored.** A retrieved source counts as a hit when its
+character range overlaps a ground-truth range with Intersection-over-Union
+> 0.05 (same file). This rewards chunks whose size is close to the reference
+range — the reason markdown sections are merged toward `max_chunk_size`
+rather than split at every heading.
 
 ---
 
@@ -221,9 +225,11 @@ code (0.62) at the cost of docs (0.79).
 
 ## Challenges faced
 
-- **Recall just under threshold.** Pure BM25 plateaued at docs recall@5 ≈ 0.78.
-  Solution: identifier-aware tokenization + asymmetric query stopword filtering
-  + tuning the chunk size to 1000, which reached 0.80.
+- **Recall just under threshold.** Splitting markdown at every heading left
+  docs recall@5 at ≈ 0.77: the tiny per-heading chunks overlapped the ~1 kB
+  reference ranges too weakly under the IoU metric. Merging adjacent sections
+  up to `max_chunk_size` (on top of identifier-aware tokenization and
+  asymmetric query stopword filtering) brought it to 0.80.
 - **Character indices after sub-chunking.** When an oversized chunk is split,
   the sub-chunk offsets are relative to the chunk, not the file. They are
   shifted by the parent chunk's start so the reported indices stay correct.
