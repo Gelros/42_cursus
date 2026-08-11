@@ -104,9 +104,7 @@ def chunk_markdown(text: str, max_size: int = 2000) -> list[RelChunk]:
     """Split on ATX headings, then greedily merge consecutive sections.
 
     Splitting on every heading alone produces many tiny chunks that align
-    poorly with the ground-truth source ranges (~1 kB on average). Merging
-    adjacent sections up to `max_size` yields chunks close to the reference
-    size, which markedly improves recall@k (measured 0.77 -> 0.80 on docs).
+    poorly with the ground-truth source ranges.
     Any single section larger than `max_size` is left oversized here and
     sub-chunked by the caller.
     """
